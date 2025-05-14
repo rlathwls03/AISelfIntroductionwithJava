@@ -9,10 +9,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.aiselfintroduction.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -62,6 +60,10 @@ public class HomeActivity extends AppCompatActivity {
                 Intent intent = new Intent(HomeActivity.this, FavoritesActivity.class);
                 startActivity(intent);
                 return true;
+            } else if (id == R.id.nav_settings) {
+                Intent intent = new Intent(HomeActivity.this, InfoFormActivity.class);
+                startActivity(intent);
+                return true;
             }
 
             return false;
@@ -103,6 +105,10 @@ public class HomeActivity extends AppCompatActivity {
         introTitles = new ArrayList<>();
         introTitles.add("백엔드 개발자 지원서");
         introTitles.add("프론트엔드 인턴 지원");
+        introTitles.add("백엔드 개발자 지원서");
+        introTitles.add("프론트엔드 인턴 지원");
+        introTitles.add("백엔드 개발자 지원서");
+        introTitles.add("프론트엔드 인턴 지원");
 
         // ✅ ListView 초기화 및 연결
         selfIntroListView = findViewById(R.id.selfIntroListView);
@@ -115,7 +121,7 @@ public class HomeActivity extends AppCompatActivity {
 
 
         fabAddIntro.setOnClickListener(v -> {
-            Intent intent = new Intent(HomeActivity.this, InputActivity.class);
+            Intent intent = new Intent(HomeActivity.this, InfoFormActivity.class);
             startActivity(intent);
         });
 

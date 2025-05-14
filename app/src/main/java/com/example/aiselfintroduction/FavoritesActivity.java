@@ -25,7 +25,8 @@ public class FavoritesActivity extends AppCompatActivity {
                 startActivity(intent);
                 return true;
             } else if (id == R.id.nav_settings) {
-                // 설정 화면으로 이동하려면 여기에 Intent 추가
+                Intent intent = new Intent(FavoritesActivity.this, InfoFormActivity.class);
+                startActivity(intent);
                 return true;
             }
             return false;
