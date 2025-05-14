@@ -3,7 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFBEA">
+    android:background="#FFFBEA"
+    android:fillViewport="true"
+    android:fitsSystemWindows="true">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -58,7 +60,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+            style="@style/CustomTextInputLayout">
 
             <EditText
                 android:id="@+id/nameInput"
@@ -73,7 +75,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+            style="@style/CustomTextInputLayout">
 
             <EditText
                 android:id="@+id/phoneInput"
@@ -88,7 +90,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+            style="@style/CustomTextInputLayout">
 
             <EditText
                 android:id="@+id/emailInput"
@@ -127,7 +129,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:layout_marginEnd="8dp"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+                style="@style/CustomTextInputLayout">
 
                 <EditText
                     android:id="@+id/schoolInput"
@@ -144,7 +146,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:layout_marginStart="8dp"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+                style="@style/CustomTextInputLayout">
 
                 <EditText
                     android:id="@+id/majorInput"
@@ -164,9 +166,6 @@
             android:text="자격증/어학성적"
             android:textSize="14sp"
             android:textStyle="bold"
-            android:maxLines="1"
-            android:singleLine="true"
-            android:imeOptions="actionDone"
             android:layout_marginBottom="6dp" />
 
         <LinearLayout
@@ -184,6 +183,9 @@
                 android:background="@drawable/edit_text_background"
                 android:padding="12dp"
                 android:minHeight="48dp"
+                android:maxLines="1"
+                android:singleLine="true"
+                android:imeOptions="actionDone"
                 android:layout_marginEnd="8dp" />
 
             <ImageButton

@@ -28,7 +28,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".InfoFormActivity" />
+        <activity android:name=".InfoFormActivity"
+            android:windowSoftInputMode="adjustPan"
+            android:exported="true"/>
+        <activity android:name=".InfoForm2Activity"
+            android:windowSoftInputMode="adjustPan"
+            android:exported="true"/>
         <activity android:name=".FavoritesActivity" />
     </application>
 </manifest>

@@ -5,5 +5,11 @@
         <item name="boxStrokeColor">#F2E4B7</item>
         <item name="boxBackgroundColor">#FFFDF5</item>
         <item name="android:textColorHint">#aaa</item>
+
+        <!-- 둥근 정도를 조절 -->
+        <item name="boxCornerRadiusTopStart">16dp</item>
+        <item name="boxCornerRadiusTopEnd">16dp</item>
+        <item name="boxCornerRadiusBottomStart">16dp</item>
+        <item name="boxCornerRadiusBottomEnd">16dp</item>
     </style>
 </resources>

@@ -3,6 +3,7 @@ package com.example.aiselfintroduction;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -17,6 +18,10 @@ import com.example.aiselfintroduction.R;
 import com.google.android.material.textfield.TextInputLayout;
 import java.util.ArrayList;
 import java.util.List;
+import android.view.MotionEvent;
+import android.view.inputmethod.InputMethodManager;
+import android.view.ViewGroup;
+
 
 public class InfoFormActivity extends AppCompatActivity {
     private EditText nameInput;
@@ -36,7 +41,7 @@ public class InfoFormActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_info_form);
-        getSupportActionBar().hide();
+//        getSupportActionBar().hide();
 
         initializeViews();
         setupSpinner();
@@ -75,6 +80,33 @@ public class InfoFormActivity extends AppCompatActivity {
         educationSpinner.setAdapter(adapter);
     }
 
+    // 키보드 숨기기 메서드
+    private void hideKeyboard(View view) {
+        InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+        if (imm != null) {
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
+    }
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        if (ev.getAction() == MotionEvent.ACTION_DOWN) {
+            View v = getCurrentFocus();
+            if (v instanceof EditText) {
+                int[] scrcoords = new int[2];
+                v.getLocationOnScreen(scrcoords);
+                float x = ev.getRawX() + v.getLeft() - scrcoords[0];
+                float y = ev.getRawY() + v.getTop() - scrcoords[1];
+
+                if (x < v.getLeft() || x > v.getRight() || y < v.getTop() || y > v.getBottom()) {
+                    v.clearFocus();
+                    hideKeyboard(v);
+                }
+            }
+        }
+        return super.dispatchTouchEvent(ev);
+    }
+
     private void setupRecyclerView() {
         FlexboxLayoutManager layoutManager = new FlexboxLayoutManager(this);
         certificatesRecyclerView.setLayoutManager(layoutManager);
@@ -83,19 +115,30 @@ public class InfoFormActivity extends AppCompatActivity {
     }
 
     private void setupListeners() {
+        // + 버튼 클릭 시 동작
         findViewById(R.id.addCertificateButton).setOnClickListener(v -> addCertificate());
 
+        // 키보드 완료(IME_ACTION_DONE) → + 버튼 동작과 동일하게 실행
+        certificateInput.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                addCertificate();
+                return true;
+            }
+            return false;
+        });
+
+        // 다음 버튼 클릭 → InfoForm2Activity 이동
         nextButton.setOnClickListener(v -> {
-            // Save user info and navigate to next screen
             saveUserInfo();
             startActivity(new Intent(this, InfoForm2Activity.class));
         });
 
+        // 홈 버튼 → 이전 화면 종료
         homeButton.setOnClickListener(v -> {
-            // Navigate to home screen
             finish();
         });
     }
+
 
     private void addCertificate() {
         String certificate = certificateInput.getText().toString().trim();

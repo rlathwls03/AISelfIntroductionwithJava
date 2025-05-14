@@ -38,7 +38,7 @@ public class HomeActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
-        getSupportActionBar().hide();
+//        getSupportActionBar().hide();
 
         userName = findViewById(R.id.userName);
         userPhone = findViewById(R.id.userPhone);
