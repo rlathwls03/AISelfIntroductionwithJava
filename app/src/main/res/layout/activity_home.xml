@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFBEA"
+    android:paddingLeft="10dp"
+    android:paddingRight="15dp"
+    android:paddingTop="20dp"
+    android:paddingBottom="0dp">
+
+    <!-- 타이틀 -->
+    <TextView
+        android:id="@+id/titleText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="AI-ntro"
+        android:textSize="60sp"
+        android:textStyle="bold"
+        android:textColor="#000"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="30dp" />
+
+    <!-- 프로필 카드 -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/profileCard"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/titleText"
+        android:layout_marginTop="16dp"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="4dp"
+        android:layout_alignParentStart="true"
+        app:cardBackgroundColor="#FCD965">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="16dp"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@android:drawable/sym_def_app_icon" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:paddingStart="16dp">
+
+                <TextView
+                    android:id="@+id/userName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="홍길동"
+                    android:textStyle="bold"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/userPhone"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="010-1234-5678"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/userEmail"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="musa@naver.com"
+                    android:textSize="14sp"
+                    android:textColor="#0000ee" />
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+
+    <!-- 리스트 제목 -->
+    <TextView
+        android:id="@+id/listTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="자기소개서 리스트"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:layout_below="@id/profileCard"
+        android:layout_marginTop="15dp"
+        android:layout_centerHorizontal="true" />
+
+    <!-- 리사이클러뷰 -->
+<!--    <androidx.recyclerview.widget.RecyclerView-->
+<!--        android:id="@+id/recyclerView"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="match_parent"-->
+<!--        android:layout_above="@id/bottom_navigation"-->
+<!--        android:layout_below="@id/listTitle"-->
+<!--        android:layout_marginTop="8dp"-->
+<!--        android:padding="8dp"-->
+<!--        android:contentDescription="자기소개서 리스트" />-->
+    <ListView
+        android:id="@+id/selfIntroListView"
+        android:layout_width="match_parent"
+        android:layout_height="250dp"
+        android:layout_below="@id/listTitle"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="20dp"
+        android:dividerHeight="8dp"
+        android:background="@android:color/white" />
+
+    <!-- 최근 작업 텍스트 -->
+    <LinearLayout
+        android:id="@+id/recentContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_below="@id/selfIntroListView"
+        android:layout_marginBottom="20dp">
+
+        <TextView
+            android:id="@+id/recentTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="📄 최근 작업한 자기소개서"
+            android:textSize="14sp"
+            android:textColor="#000"
+            android:layout_marginBottom="4dp" />
+
+        <LinearLayout
+            android:id="@+id/recentCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="12dp"
+            android:background="@drawable/recent_bg"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/ic_document" />
+
+            <TextView
+                android:id="@+id/recentText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="지원서 이름"
+                android:textSize="14sp"
+                android:textColor="#000"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp" />
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/ic_arrow_right" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- 플로팅 버튼 -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_above="@id/bottom_navigation"
+        android:layout_marginBottom="15dp"
+        android:layout_marginEnd="14dp"
+        android:src="@android:drawable/ic_input_add"
+        app:backgroundTint="#FCD965"
+        android:contentDescription="자기소개서 생성" />
+
+    <!-- 하단 탭바 -->
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottom_navigation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/bottom_nav_background"
+        app:menu="@menu/bottom_nav_menu"
+        app:itemIconTint="@color/bottom_nav_selector"
+        app:itemTextColor="@color/bottom_nav_selector"
+        app:labelVisibilityMode="labeled" />
+
+
+</RelativeLayout>
