@@ -1,6 +1,7 @@
 package com.example.aiselfintroduction;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -9,30 +10,48 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class HomeActivity extends AppCompatActivity {
-    @Override
-    protected void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
-
-        // 홈 탭으로 왔을 때 상태 수동 갱신
-        BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
-        bottomNav.setSelectedItemId(R.id.nav_home);
-    }
-
     private TextView userName, userPhone, userEmail, recentText;
     private ListView selfIntroListView;
     private FloatingActionButton fabAddIntro;
     private LinearLayout recentContainer;
-
+    private RecyclerView recyclerView;
+    private SelfIntroAdapter adapter;
+    private List<SelfIntro> introList;
     private ArrayList<String> introTitles;
-    private ArrayAdapter<String> adapter;
+    public static final String LAST_EDITED_KEY = "LAST_EDITED_INTRO_NAME";
+
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
+        bottomNav.setSelectedItemId(R.id.nav_home);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // 화면이 다시 보일 때마다 즐겨찾기 상태 갱신
+        SharedPreferences prefs = getSharedPreferences("IntroPrefs", MODE_PRIVATE);
+        Set<String> favorites = prefs.getStringSet("FAVORITE_INTROS", new HashSet<>());
+
+        for (SelfIntro intro : introList) {
+            intro.setFavorite(favorites.contains(intro.getTitle()));
+        }
+        adapter.notifyDataSetChanged();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,9 +65,20 @@ public class HomeActivity extends AppCompatActivity {
         recentText = findViewById(R.id.recentText);
         recentContainer = findViewById(R.id.recentContainer);
         fabAddIntro = findViewById(R.id.fab);
+        recyclerView = findViewById(R.id.recyclerView);
+
+        // 사용자 정보 불러오기
+        UserInfoStorage userInfoStorage = new UserInfoStorage(this);
+        UserInfo userInfo = userInfoStorage.loadUserInfo();
+        if (userInfo != null) {
+            userName.setText(userInfo.getName());
+            userPhone.setText(userInfo.getPhone());
+            userEmail.setText(userInfo.getEmail());
+        }
+
+        // 하단 네비게이션 바 처리
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
         bottomNav.setSelectedItemId(R.id.nav_home);
-
         bottomNav.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
 
@@ -69,6 +99,7 @@ public class HomeActivity extends AppCompatActivity {
             return false;
         });
 
+        // 플로팅 버튼
         fabAddIntro.setOnTouchListener(new View.OnTouchListener() {
             float dX, dY;
             int lastAction;
@@ -101,35 +132,50 @@ public class HomeActivity extends AppCompatActivity {
             }
         });
 
-        // 예시 데이터
-        introTitles = new ArrayList<>();
-        introTitles.add("백엔드 개발자 지원서");
-        introTitles.add("프론트엔드 인턴 지원");
-        introTitles.add("백엔드 개발자 지원서");
-        introTitles.add("프론트엔드 인턴 지원");
-        introTitles.add("백엔드 개발자 지원서");
-        introTitles.add("프론트엔드 인턴 지원");
+        // RecyclerView 초기화
+        introList = new ArrayList<>();
+        introList.add(new SelfIntro("테스트 자기소개서1", true));
+        introList.add(new SelfIntro("백엔드 개발자 지원서", false));
+        introList.add(new SelfIntro("프론트엔드 인턴 지원", false));
+        introList.add(new SelfIntro("백엔드 개발자 지원서2", false));
+        introList.add(new SelfIntro("프론트엔드 인턴 지원2", false));
+        introList.add(new SelfIntro("테스트 자기소개서2", true));
+        introList.add(new SelfIntro("백엔드 개발자 지원서3", false));
+        introList.add(new SelfIntro("프론트엔드 인턴 지원3", false));
 
-        // ✅ ListView 초기화 및 연결
-        selfIntroListView = findViewById(R.id.selfIntroListView);
-        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, introTitles);
-        selfIntroListView.setAdapter(adapter);
+        adapter = new SelfIntroAdapter(this, introList);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setAdapter(adapter);
 
-        RecyclerView recyclerView;
-
-        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, introTitles);
-
-
+        // 플로팅 버튼 이벤트리스너
         fabAddIntro.setOnClickListener(v -> {
-            Intent intent = new Intent(HomeActivity.this, InfoFormActivity.class);
+            Intent intent = new Intent(HomeActivity.this, InputActivity.class);
             startActivity(intent);
         });
 
+        // 즐겨찾기 항목
+        SharedPreferences prefs = getSharedPreferences("IntroPrefs", MODE_PRIVATE);
+        Set<String> favorites = prefs.getStringSet("FAVORITE_INTROS", new HashSet<>());
+        introList.add(new SelfIntro("테스트 자기소개서", favorites.contains("테스트 자기소개서")));
+
+        // 최근 항목 불러오기
+        String recentIntroName = prefs.getString(LAST_EDITED_KEY, null);
+
+        // 항상 recentContainer 보이도록 설정
         recentContainer.setVisibility(View.VISIBLE);
-        recentText.setText("프론트엔드 인턴 지원");
-        recentContainer.setOnClickListener(v -> {
-            // 최근 자기소개서 보기
-        });
+
+        if (recentIntroName != null && !recentIntroName.isEmpty()) {
+            recentText.setText(recentIntroName);
+            recentContainer.setOnClickListener(v -> {
+                Intent intent = new Intent(HomeActivity.this, SelfIntroDetailActivity.class);
+                intent.putExtra("introName", recentIntroName);
+                startActivity(intent);
+            });
+        } else {
+            recentText.setText("수정한 자기소개서가 없습니다");
+            // 클릭 비활성화
+            recentContainer.setOnClickListener(null);
+        }
     }
 }
 

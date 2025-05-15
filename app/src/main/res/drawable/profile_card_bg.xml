@@ -1,6 +1,11 @@
-<!-- res/drawable/profile_card_bg.xml -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="rectangle">
-    <solid android:color="#FCD965" />
+
+    <gradient
+        android:startColor="#FDEB75"
+        android:endColor="#F9B233"
+        android:angle="45"
+        android:type="linear" />
+
     <corners android:radius="16dp" />
 </shape>

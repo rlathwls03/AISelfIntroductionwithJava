@@ -22,7 +22,6 @@ import android.view.MotionEvent;
 import android.view.inputmethod.InputMethodManager;
 import android.view.ViewGroup;
 
-
 public class InfoFormActivity extends AppCompatActivity {
     private EditText nameInput;
     private EditText phoneInput;
@@ -36,6 +35,7 @@ public class InfoFormActivity extends AppCompatActivity {
     private List<String> certificates = new ArrayList<>();
     private Button nextButton;
     private ImageButton homeButton;
+    private UserInfoStorage userInfoStorage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,10 +43,42 @@ public class InfoFormActivity extends AppCompatActivity {
         setContentView(R.layout.activity_info_form);
 //        getSupportActionBar().hide();
 
+        userInfoStorage = new UserInfoStorage(this);
         initializeViews();
         setupSpinner();
         setupRecyclerView();
         setupListeners();
+        loadSavedData(); // 저장된 데이터 불러오기
+    }
+
+    private void loadSavedData() {
+        UserInfo savedInfo = userInfoStorage.loadUserInfo();
+        if (savedInfo != null) {
+            // 저장된 데이터 복원
+            nameInput.setText(savedInfo.getName());
+            phoneInput.setText(savedInfo.getPhone());
+            emailInput.setText(savedInfo.getEmail());
+
+            // 학력 선택
+            String savedEducation = savedInfo.getEducationLevel();
+            if (savedEducation != null) {
+                ArrayAdapter adapter = (ArrayAdapter) educationSpinner.getAdapter();
+                int position = adapter.getPosition(savedEducation);
+                if (position >= 0) {
+                    educationSpinner.setSelection(position);
+                }
+            }
+
+            schoolInput.setText(savedInfo.getSchool());
+            majorInput.setText(savedInfo.getMajor());
+
+            // 자격증 목록 복원
+            certificates.clear();
+            if (savedInfo.getCertificates() != null) {
+                certificates.addAll(savedInfo.getCertificates());
+                certificatesAdapter.notifyDataSetChanged();
+            }
+        }
     }
 
     private void initializeViews() {
@@ -129,14 +161,22 @@ public class InfoFormActivity extends AppCompatActivity {
 
         // 다음 버튼 클릭 → InfoForm2Activity 이동
         nextButton.setOnClickListener(v -> {
+            // user 정보 json에 저장
             saveUserInfo();
-            startActivity(new Intent(this, InfoForm2Activity.class));
+            // InfoForm2Activity로 이동
+            Intent intent = new Intent(InfoFormActivity.this, InfoForm2Activity.class);
+            startActivity(intent);
         });
 
         // 홈 버튼 → 이전 화면 종료
         homeButton.setOnClickListener(v -> {
+            Intent intent = new Intent(InfoFormActivity.this, HomeActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            intent.putExtra("fromInfoForm", true); // 플래그 전송
+            startActivity(intent);
             finish();
         });
+
     }
 
 
@@ -155,6 +195,19 @@ public class InfoFormActivity extends AppCompatActivity {
     }
 
     private void saveUserInfo() {
-        // TODO: Implement saving user info to storage
+        UserInfo savedInfo = userInfoStorage.loadUserInfo();
+        UserInfo userInfo = (savedInfo != null) ? savedInfo : new UserInfo();
+
+        // 기본 정보 설정
+        userInfo.setName(nameInput.getText().toString().trim());
+        userInfo.setPhone(phoneInput.getText().toString().trim());
+        userInfo.setEmail(emailInput.getText().toString().trim());
+        userInfo.setEducationLevel(educationSpinner.getSelectedItem().toString());
+        userInfo.setSchool(schoolInput.getText().toString().trim());
+        userInfo.setMajor(majorInput.getText().toString().trim());
+        userInfo.setCertificates(new ArrayList<>(certificates));
+
+        // 저장
+        userInfoStorage.saveUserInfo(userInfo);
     }
 }

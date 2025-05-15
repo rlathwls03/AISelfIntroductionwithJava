@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
@@ -64,6 +65,17 @@
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
+            <!-- RecyclerView for favorites -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerview_favorites"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/favoritesCard"
+                android:padding="8dp"
+                android:visibility="gone"
+                android:contentDescription="즐겨찾기한 자기소개서 목록"
+                android:accessibilityLiveRegion="polite" />
+
             <!-- 비어 있을 때 안내 메시지 -->
             <LinearLayout
                 android:id="@+id/emptyState"
@@ -73,12 +85,14 @@
                 android:layout_below="@id/favoritesCard"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="80dp"
+                android:visibility="visible"
                 android:gravity="center_horizontal">
 
                 <ImageView
                     android:layout_width="64dp"
                     android:layout_height="64dp"
-                    android:src="@drawable/ic_folder_gray" />
+                    android:src="@drawable/ic_folder_gray"
+                    android:contentDescription="빈 폴더 아이콘"/>
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -105,6 +119,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/bottom_nav_background"
+        android:contentDescription="하단 네비게이션 메뉴"
         app:menu="@menu/bottom_nav_menu"
         app:itemIconTint="@color/bottom_nav_selector"
         app:itemTextColor="@color/bottom_nav_selector"
