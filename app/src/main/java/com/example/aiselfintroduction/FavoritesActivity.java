@@ -2,9 +2,15 @@ package com.example.aiselfintroduction;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -30,12 +36,18 @@ public class FavoritesActivity extends AppCompatActivity {
     private boolean isManuallyUpdating = false;
     private LinearLayout emptyState;
 
+    // SelfIntroStorage 추가
+    private SelfIntroStorage selfIntroStorage;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_favorites);
 
         prefs = getSharedPreferences("IntroPrefs", MODE_PRIVATE);
+
+        // SelfIntroStorage 초기화
+        selfIntroStorage = new SelfIntroStorage(this);
 
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
         bottomNav.setSelectedItemId(R.id.nav_favorite);
@@ -47,6 +59,8 @@ public class FavoritesActivity extends AppCompatActivity {
 
         favoriteIntros = new ArrayList<>();
         adapter = new SelfIntroAdapter(this, favoriteIntros);
+
+        // 즐겨찾기 제거 리스너 설정
         adapter.setOnFavoriteChangedListener(new SelfIntroAdapter.OnFavoriteChangedListener() {
             @Override
             public void onFavoriteRemoved(SelfIntro item, int position) {
@@ -56,6 +70,15 @@ public class FavoritesActivity extends AppCompatActivity {
                 isManuallyUpdating = false;
             }
         });
+
+        // 이름 변경 리스너 설정 추가
+        adapter.setOnItemRenameListener(new SelfIntroAdapter.OnItemRenameListener() {
+            @Override
+            public void onItemRename(String oldName, String newName) {
+                handleItemRename(oldName, newName);
+            }
+        });
+
         recyclerView.setAdapter(adapter);
 
         loadFavorites();
@@ -85,6 +108,106 @@ public class FavoritesActivity extends AppCompatActivity {
         }
     }
 
+    // 이름 변경 처리 함수 (HomeActivity와 동일한 로직)
+    private void handleItemRename(String oldName, String newName) {
+        try {
+            // 로그 추가
+            Log.d("FavoritesActivity", "이름 변경: " + oldName + " → " + newName);
+
+            // 1. 기존 자기소개서 데이터 로드
+            SelfIntroData oldData = selfIntroStorage.loadSelfIntro(oldName);
+
+            if (oldData == null) {
+                Log.e("FavoritesActivity", "기존 데이터를 찾을 수 없음: " + oldName);
+                Log.d("FavoritesActivity", "기존 데이터가 없어서 빈 데이터를 생성합니다: " + oldName);
+                oldData = new SelfIntroData(
+                        "직무역량 내용을 입력하세요.",
+                        "입사후포부 내용을 입력하세요.",
+                        "지원동기 내용을 입력하세요.",
+                        "성격장단점 내용을 입력하세요."
+                );
+            }
+
+            // 2. 새 이름으로 데이터 저장
+            selfIntroStorage.saveSelfIntro(newName, oldData);
+            Log.d("FavoritesActivity", "새 이름으로 저장 완료: " + newName);
+
+            // 3. 기존 이름의 데이터 삭제
+            selfIntroStorage.deleteSelfIntro(oldName);
+            Log.d("FavoritesActivity", "기존 데이터 삭제 완료: " + oldName);
+
+            // 4. UI 리스트에서 이름 업데이트
+            for (SelfIntro intro : favoriteIntros) {
+                if (intro.getTitle().equals(oldName)) {
+                    intro.setTitle(newName);
+                    break;
+                }
+            }
+
+            // 5. 어댑터에 변경 알림
+            adapter.notifyDataSetChanged();
+
+            // 6. 즐겨찾기 목록에서도 이름 업데이트
+            Set<String> favorites = prefs.getStringSet(FAVORITES_KEY, new HashSet<>());
+            if (favorites.contains(oldName)) {
+                Set<String> updatedFavorites = new HashSet<>(favorites);
+                updatedFavorites.remove(oldName);
+                updatedFavorites.add(newName);
+                prefs.edit().putStringSet(FAVORITES_KEY, updatedFavorites).apply();
+                Log.d("FavoritesActivity", "즐겨찾기 목록에서 이름 업데이트 완료");
+            }
+
+            // 7. 최근 편집 항목도 업데이트
+            String recentIntro = prefs.getString(HomeActivity.LAST_EDITED_KEY, null);
+            if (oldName.equals(recentIntro)) {
+                prefs.edit().putString(HomeActivity.LAST_EDITED_KEY, newName).apply();
+                Log.d("FavoritesActivity", "최근 편집 항목 업데이트 완료");
+            }
+
+            // 8. 성공 토스트 표시
+            showYellowToast("이름이 변경되었습니다: " + newName);
+
+        } catch (Exception e) {
+            Log.e("FavoritesActivity", "이름 변경 실패", e);
+            e.printStackTrace();
+            showYellowToast("이름 변경 중 오류가 발생했습니다.");
+        }
+    }
+
+    // 노란색 토스트 메서드 (HomeActivity와 동일)
+    private void showYellowToast(String message) {
+        try {
+            // 커스텀 레이아웃 생성
+            LinearLayout layout = new LinearLayout(this);
+            layout.setOrientation(LinearLayout.HORIZONTAL);
+            layout.setPadding(40, 20, 40, 20);
+
+            // 노란색 배경 설정
+            GradientDrawable shape = new GradientDrawable();
+            shape.setColor(Color.parseColor("#FCD965"));
+            shape.setCornerRadius(30);
+            layout.setBackground(shape);
+
+            // 텍스트 뷰 생성
+            TextView textView = new TextView(this);
+            textView.setText(message);
+            textView.setTextColor(Color.BLACK);
+            textView.setTextSize(16);
+            textView.setGravity(Gravity.CENTER);
+            layout.addView(textView);
+
+            // 토스트 생성
+            Toast toast = new Toast(this);
+            toast.setDuration(Toast.LENGTH_SHORT);
+            toast.setView(layout);
+            toast.setGravity(Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL, 0, 150);
+            toast.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+        }
+    }
+
     private void loadFavorites() {
         Set<String> favorites = prefs.getStringSet(FAVORITES_KEY, new HashSet<>());
 
@@ -103,6 +226,28 @@ public class FavoritesActivity extends AppCompatActivity {
         } else {
             recyclerView.setVisibility(View.VISIBLE);
             emptyState.setVisibility(View.GONE);
+        }
+    }
+
+    // 저장소에서 자기소개서 삭제하는 메서드
+    public void deleteSelfIntroFromStorage(String title) {
+        try {
+            // 1. 저장소에서 삭제
+            selfIntroStorage.deleteSelfIntro(title);
+
+            // 2. 최근 편집 항목이 삭제된 자기소개서면 제거
+            SharedPreferences prefs = getSharedPreferences("IntroPrefs", MODE_PRIVATE);
+            String recentIntro = prefs.getString(HomeActivity.LAST_EDITED_KEY, null);
+            if (title.equals(recentIntro)) {
+                prefs.edit().remove(HomeActivity.LAST_EDITED_KEY).apply();
+            }
+
+            Log.d("FavoritesActivity", "저장소에서 자기소개서 삭제 완료: " + title);
+            showYellowToast("자기소개서가 삭제되었습니다.");
+
+        } catch (Exception e) {
+            Log.e("FavoritesActivity", "저장소 삭제 실패", e);
+            showYellowToast("삭제 중 오류가 발생했습니다.");
         }
     }
 }

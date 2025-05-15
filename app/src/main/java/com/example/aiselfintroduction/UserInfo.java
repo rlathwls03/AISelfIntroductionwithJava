@@ -137,11 +137,17 @@ public class UserInfo implements Serializable {
         private String fileName;
         private String filePath;
         private String mimeType;
+        private String extractedText;
 
-        public FileInfo(String fileName, String filePath, String mimeType) {
+        public FileInfo(String fileName, String filePath, String mimeType, String extractedText) {
             this.fileName = fileName;
             this.filePath = filePath;
             this.mimeType = mimeType;
+            this.extractedText = extractedText;
+        }
+        // 기존 생성자도 유지할 경우
+        public FileInfo(String fileName, String filePath, String mimeType) {
+            this(fileName, filePath, mimeType, ""); // 기본 빈 OCR 값
         }
 
         public String getFileName() {
@@ -155,5 +161,6 @@ public class UserInfo implements Serializable {
         public String getMimeType() {
             return mimeType;
         }
+        public String getExtractedText() { return extractedText; }
     }
 }

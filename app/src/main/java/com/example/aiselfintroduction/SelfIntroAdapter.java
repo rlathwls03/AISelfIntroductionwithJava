@@ -1,10 +1,15 @@
 package com.example.aiselfintroduction;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
@@ -34,21 +39,102 @@ public class SelfIntroAdapter extends RecyclerView.Adapter<SelfIntroAdapter.View
         this.favoriteChangedListener = listener;
     }
 
+    // 이름 변경 인터페이스
+    public interface OnItemRenameListener {
+        void onItemRename(String oldName, String newName);
+    }
+
+    private OnItemRenameListener renameListener;
+
     public SelfIntroAdapter(Context context, List<SelfIntro> list) {
         this.context = context;
         this.selfIntroList = list;
         this.prefs = context.getSharedPreferences("IntroPrefs", Context.MODE_PRIVATE);
     }
 
+    public void setOnItemRenameListener(OnItemRenameListener listener) {
+        this.renameListener = listener;
+    }
+
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        ImageView starIcon, moreIcon;
+        ImageView starIcon, moreIcon, arrowIcon, documentIcon;
         TextView titleText;
+        EditText editText;
+        private boolean isEditing = false;
 
         public ViewHolder(View view) {
             super(view);
             starIcon = view.findViewById(R.id.starIcon);
             moreIcon = view.findViewById(R.id.moreIcon);
             titleText = view.findViewById(R.id.titleText);
+            documentIcon = view.findViewById(R.id.documentIcon);
+
+            // EditText를 동적으로 생성하여 titleText와 같은 위치에 배치
+            ViewGroup parent = (ViewGroup) titleText.getParent();
+            editText = new EditText(view.getContext());
+            editText.setLayoutParams(titleText.getLayoutParams());
+            editText.setTextSize(16);
+            editText.setTextColor(titleText.getCurrentTextColor());
+            editText.setBackgroundResource(android.R.color.transparent);
+            editText.setSingleLine(true);
+            editText.setImeOptions(EditorInfo.IME_ACTION_DONE);
+            editText.setVisibility(View.GONE);
+            parent.addView(editText);
+        }
+
+        public void startEditing(String currentTitle, SelfIntroAdapter adapter) {
+            isEditing = true;
+
+            // TextView 숨기고 EditText 보이기
+            titleText.setVisibility(View.GONE);
+            editText.setVisibility(View.VISIBLE);
+            editText.setText(currentTitle);
+            editText.selectAll();
+            editText.requestFocus();
+
+            // 키보드 표시
+            InputMethodManager imm = (InputMethodManager) itemView.getContext()
+                    .getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.showSoftInput(editText, InputMethodManager.SHOW_IMPLICIT);
+
+            // Enter 키 또는 포커스 잃을 때 편집 완료
+            editText.setOnEditorActionListener((v, actionId, event) -> {
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    finishEditing(adapter);
+                    return true;
+                }
+                return false;
+            });
+
+            editText.setOnFocusChangeListener((v, hasFocus) -> {
+                if (!hasFocus && isEditing) {
+                    finishEditing(adapter);
+                }
+            });
+        }
+
+        public void finishEditing(SelfIntroAdapter adapter) {
+            if (!isEditing) return;
+
+            isEditing = false;
+            String newName = editText.getText().toString().trim();
+            String oldName = titleText.getText().toString();
+
+            // 키보드 숨기기
+            InputMethodManager imm = (InputMethodManager) itemView.getContext()
+                    .getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
+
+            // EditText 숨기고 TextView 보이기
+            editText.setVisibility(View.GONE);
+            titleText.setVisibility(View.VISIBLE);
+
+            // 이름이 변경되었고 비어있지 않다면 콜백 호출
+            if (!newName.isEmpty() && !newName.equals(oldName)) {
+                if (adapter.renameListener != null) {
+                    adapter.renameListener.onItemRename(oldName, newName);
+                }
+            }
         }
     }
 
@@ -72,6 +158,18 @@ public class SelfIntroAdapter extends RecyclerView.Adapter<SelfIntroAdapter.View
         holder.starIcon.setImageResource(
                 item.isFavorite() ? R.drawable.ic_star_filled : R.drawable.ic_star_outline
         );
+
+        // 제목 클릭 시 상세 화면으로 이동 (편집 중이 아닐 때만)
+        holder.titleText.setOnClickListener(v -> {
+            if (!holder.isEditing) {
+                Intent intent = new Intent(context, SelfIntroDetailActivity.class);
+                intent.putExtra("introName", item.getTitle());
+                context.startActivity(intent);
+
+                // 최근 편집 항목으로 저장
+                prefs.edit().putString(HomeActivity.LAST_EDITED_KEY, item.getTitle()).apply();
+            }
+        });
 
         // 즐겨찾기 토글
         holder.starIcon.setOnClickListener(v -> {
@@ -104,10 +202,11 @@ public class SelfIntroAdapter extends RecyclerView.Adapter<SelfIntroAdapter.View
             popup.getMenuInflater().inflate(R.menu.self_intro_popup_menu, popup.getMenu());
             popup.setOnMenuItemClickListener(menuItem -> {
                 int id = menuItem.getItemId();
-                if (id == R.id.menu_edit) {
-                    // 수정 로직
+                if (id == R.id.menu_rename) { // 이름 변경
+                    // 이름 변경 - ic_more_vert를 누르면 이름 편집 모드 시작
+                    holder.startEditing(item.getTitle(), this);
                     return true;
-                } else if (id == R.id.menu_delete) {
+                } else if (id == R.id.menu_delete) { //  삭제
                     // 삭제 시 즐겨찾기에서도 제거
                     Set<String> currentFavorites = new HashSet<>(
                             prefs.getStringSet(FAVORITES_KEY, new HashSet<>())
@@ -117,8 +216,10 @@ public class SelfIntroAdapter extends RecyclerView.Adapter<SelfIntroAdapter.View
 
                     selfIntroList.remove(position);
                     notifyItemRemoved(position);
+                    // 삭제 - 저장소에서도 제거하도록 수정
+                    deleteIntroItem(item, position);
                     return true;
-                } else if (id == R.id.menu_download) {
+                } else if (id == R.id.menu_download) { // 다운로드
                     // 다운로드 로직
                     return true;
                 }
@@ -126,6 +227,35 @@ public class SelfIntroAdapter extends RecyclerView.Adapter<SelfIntroAdapter.View
             });
             popup.show();
         });
+    }
+
+    // 삭제 처리를 위한 새로운 메서드 추가 (SelfIntroAdapter 클래스 내부)
+    private void deleteIntroItem(SelfIntro item, int position) {
+        try {
+            // 1. 저장소에서 삭제
+            if (context instanceof HomeActivity) {
+                ((HomeActivity) context).deleteSelfIntroFromStorage(item.getTitle());
+            } else if (context instanceof FavoritesActivity) {
+                ((FavoritesActivity) context).deleteSelfIntroFromStorage(item.getTitle());
+            }
+
+            // 2. 즐겨찾기에서도 제거
+            Set<String> currentFavorites = new HashSet<>(
+                    prefs.getStringSet(FAVORITES_KEY, new HashSet<>())
+            );
+            currentFavorites.remove(item.getTitle());
+            prefs.edit().putStringSet(FAVORITES_KEY, currentFavorites).commit();
+
+            // 3. UI에서 제거
+            selfIntroList.remove(position);
+            notifyItemRemoved(position);
+
+            Log.d("SelfIntroAdapter", "자기소개서 삭제 완료: " + item.getTitle());
+
+        } catch (Exception e) {
+            Log.e("SelfIntroAdapter", "자기소개서 삭제 실패", e);
+            e.printStackTrace();
+        }
     }
 
     @Override

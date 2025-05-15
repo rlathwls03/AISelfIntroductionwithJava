@@ -10,6 +10,9 @@ public class SelfIntro {
     }
 
     public String getTitle() { return title; }
+    public void setTitle(String title) {
+        this.title = title;
+    }
     public boolean isFavorite() { return isFavorite; }
     public void setFavorite(boolean favorite) { isFavorite = favorite; }
 }

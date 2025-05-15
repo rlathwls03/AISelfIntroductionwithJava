@@ -1,12 +1,16 @@
 package com.example.aiselfintroduction;
 
+import static android.content.ContentValues.TAG;
+
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.OpenableColumns;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -19,6 +23,8 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.aiselfintroduction.ocr.GoogleOCRProcessor;
 import com.google.android.flexbox.FlexboxLayoutManager;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -133,6 +139,40 @@ public class InfoForm2Activity extends AppCompatActivity {
         }
     }
 
+    // OCR 결과를 SharedPreferences에 저장하는 메서드
+    private void saveOCRResult(String fileName, String extractedText) {
+        try {
+            SharedPreferences prefs = getSharedPreferences("OCR_RESULTS", MODE_PRIVATE);
+            SharedPreferences.Editor editor = prefs.edit();
+
+            // 파일별로 OCR 결과 저장
+            editor.putString("ocr_" + fileName, extractedText);
+            editor.putLong("ocr_timestamp_" + fileName, System.currentTimeMillis());
+
+            // 최근 OCR 결과도 저장
+            editor.putString("last_ocr_result", extractedText);
+            editor.putString("last_ocr_filename", fileName);
+            editor.putLong("last_ocr_timestamp", System.currentTimeMillis());
+
+            editor.apply();
+
+            Log.d(TAG, "✅ OCR 결과 저장 완료 - 파일: " + fileName);
+        } catch (Exception e) {
+            Log.e(TAG, "❌ OCR 결과 저장 실패: " + e.getMessage());
+        }
+    }
+
+    // OCR 결과를 불러오는 메서드 (필요시 사용)
+    private String loadOCRResult(String fileName) {
+        try {
+            SharedPreferences prefs = getSharedPreferences("OCR_RESULTS", MODE_PRIVATE);
+            return prefs.getString("ocr_" + fileName, "");
+        } catch (Exception e) {
+            Log.e(TAG, "OCR 결과 불러오기 실패: " + e.getMessage());
+            return "";
+        }
+    }
+
     // onResume 메서드 추가 - 액티비티가 다시 활성화될 때 현재 상태 유지
     @Override
     protected void onResume() {
@@ -178,42 +218,101 @@ public class InfoForm2Activity extends AppCompatActivity {
             String fileName = getFileName(uri);
             String mimeType = getContentResolver().getType(uri);
 
-            // 파일명 유효성 확인
             if (fileName == null || fileName.trim().isEmpty()) {
                 showSafeToast("잘못된 파일입니다.");
                 return;
             }
 
-            // 중복 파일 확인
             if (isFileAlreadySelected(fileName)) {
                 showSafeToast("'" + fileName + "'은(는) 이미 선택된 파일입니다.");
                 return;
             }
 
-            // PDF 파일인지 확인
             if (mimeType == null || !mimeType.equals("application/pdf")) {
                 showSafeToast("PDF 파일만 선택할 수 있습니다.");
                 return;
             }
 
-            // Copy file to app's private storage
             String filePath = copyFileToPrivateStorage(uri, fileName);
 
             if (filePath != null) {
-                UserInfo.FileInfo fileInfo = new UserInfo.FileInfo(fileName, filePath, mimeType);
-                selectedFiles.add(fileInfo);
+                // 임시로 파일 정보 추가 (OCR 텍스트는 나중에 업데이트)
+                UserInfo.FileInfo tempFileInfo = new UserInfo.FileInfo(
+                        fileName,
+                        filePath,
+                        mimeType,
+                        "OCR 처리 중..." // 임시 텍스트
+                );
+                selectedFiles.add(tempFileInfo);
                 updateFileList();
 
-                // 파일 추가 성공 Toast
-                showSafeToast("'" + fileName + "'이(가) 추가되었습니다.");
+                // OCR 실행 시작
+                showSafeToast("OCR 처리 중...");
+                saveButton.setEnabled(false); // OCR 중 저장 버튼 비활성화
+
+                final int fileIndex = selectedFiles.size() - 1; // 현재 파일의 인덱스
+
+                GoogleOCRProcessor.extractTextFromPDF(this, uri, new GoogleOCRProcessor.OCRCallback() {
+                    @Override
+                    public void onSuccess(String extractedText) {
+                        runOnUiThread(() -> {
+                            Log.d(TAG, "📄 OCR 성공 - 파일: " + fileName);
+                            Log.d(TAG, "📄 추출된 텍스트 길이: " + extractedText.length());
+
+                            // OCR 성공 - 파일 정보 업데이트
+                            if (fileIndex < selectedFiles.size()) {
+                                UserInfo.FileInfo updatedFileInfo = new UserInfo.FileInfo(
+                                        fileName,
+                                        filePath,
+                                        mimeType,
+                                        extractedText
+                                );
+                                selectedFiles.set(fileIndex, updatedFileInfo);
+
+                                // OCR 결과를 SharedPreferences에도 저장
+                                saveOCRResult(fileName, extractedText);
+
+                                updateFileList();
+                                showSafeToast("'" + fileName + "' OCR 완료");
+                            }
+
+                            saveButton.setEnabled(true); // 저장 버튼 재활성화
+                        });
+                    }
+
+                    @Override
+                    public void onFailure(String errorMessage) {
+                        runOnUiThread(() -> {
+                            Log.e(TAG, "❌ OCR 실패 - 파일: " + fileName + ", 오류: " + errorMessage);
+
+                            // OCR 실패 - 빈 텍스트로 파일 정보 업데이트
+                            if (fileIndex < selectedFiles.size()) {
+                                UserInfo.FileInfo updatedFileInfo = new UserInfo.FileInfo(
+                                        fileName,
+                                        filePath,
+                                        mimeType,
+                                        "OCR 실패: " + errorMessage
+                                );
+                                selectedFiles.set(fileIndex, updatedFileInfo);
+                                updateFileList();
+                            }
+
+                            showSafeToast("OCR 실패: " + errorMessage);
+                            saveButton.setEnabled(true); // 저장은 가능하게 처리
+                        });
+                    }
+                });
+
             } else {
                 showSafeToast("파일 저장에 실패했습니다.");
             }
+
         } catch (Exception e) {
             e.printStackTrace();
             showSafeToast("파일 처리 중 오류가 발생했습니다.");
         }
     }
+
 
     // 이미 선택된 파일인지 확인하는 메서드
     private boolean isFileAlreadySelected(String fileName) {
@@ -400,8 +499,17 @@ public class InfoForm2Activity extends AppCompatActivity {
         savedInfo.setExtraSentence(extraSentenceInput.getText().toString().trim());
         savedInfo.setFiles(new ArrayList<>(selectedFiles));
 
+        // 🔥 여기가 핵심: 현재 UI에 있는 파일 목록만 저장
+        savedInfo.setFiles(new ArrayList<>(selectedFiles));
+
         // 저장
         userInfoStorage.saveUserInfo(savedInfo);
+
+        // OCR 결과가 포함된 파일 정보 로그
+        for (UserInfo.FileInfo fileInfo : selectedFiles) {
+            Log.d(TAG, "💾 저장된 파일: " + fileInfo.getFileName() +
+                    ", OCR 텍스트 길이: " + fileInfo.getExtractedText().length());
+        }
 
         // 저장 후 UI 업데이트 - 모든 Toast를 showSafeToast로 처리
         showSafeToast("저장되었습니다.");
@@ -413,6 +521,13 @@ public class InfoForm2Activity extends AppCompatActivity {
             startActivity(intent);
             finish();
         }, 1500);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // OCR 프로세서 정리
+//        GoogleOCRProcessor.shutdown();
     }
 
     private void initializeViews() {
