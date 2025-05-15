@@ -13,6 +13,8 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.animation.ObjectAnimator;
+import android.view.animation.AccelerateDecelerateInterpolator;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -237,6 +239,47 @@ public class HomeActivity extends AppCompatActivity {
                 handleItemRename(oldName, newName);
             }
         });
+
+        // 처음 진입시 안내 애니메이션 호출 추가
+        fabAddIntro.postDelayed(() -> {
+            showFirstTimeHint();
+        }, 500);
+    }
+
+    // 3. 처음 진입시 안내 애니메이션 메서드 추가
+    /**
+     * 처음 앱을 실행한 사용자에게 플로팅 버튼의 용도를 안내하는 애니메이션
+     */
+    private void showFirstTimeHint() {
+        SharedPreferences prefs = getSharedPreferences("IntroPrefs", MODE_PRIVATE);
+        boolean isFirstTime = prefs.getBoolean("FIRST_TIME_HOME", true);
+
+        Log.d("HomeActivity", "showFirstTimeHint 호출됨, isFirstTime: " + isFirstTime);
+
+        if (isFirstTime) {
+            // 뷰가 완전히 로드된 후 애니메이션 실행
+            fabAddIntro.post(() -> {
+                Log.d("HomeActivity", "애니메이션 시작");
+
+                // 플로팅 버튼 주위에 파동 효과
+                ObjectAnimator scaleX = ObjectAnimator.ofFloat(fabAddIntro, "scaleX", 1f, 1.3f, 1f);
+                ObjectAnimator scaleY = ObjectAnimator.ofFloat(fabAddIntro, "scaleY", 1f, 1.3f, 1f);
+
+                scaleX.setDuration(600);
+                scaleY.setDuration(600);
+                scaleX.setRepeatCount(3);
+                scaleY.setRepeatCount(3);
+                scaleX.setInterpolator(new AccelerateDecelerateInterpolator());
+                scaleY.setInterpolator(new AccelerateDecelerateInterpolator());
+
+                scaleX.start();
+                scaleY.start();
+            });
+
+            // 첫 방문 표시 저장
+            prefs.edit().putBoolean("FIRST_TIME_HOME", false).apply();
+            Log.d("HomeActivity", "첫 방문 표시 저장됨");
+        }
     }
 
     // 더미 데이터 생성 및 저장 메서드
