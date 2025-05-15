@@ -145,7 +145,7 @@ public class HomeActivity extends AppCompatActivity {
                         dX = view.getX() - event.getRawX();
                         dY = view.getY() - event.getRawY();
                         lastAction = android.view.MotionEvent.ACTION_DOWN;
-                        return true;
+                        return false;
 
                     case android.view.MotionEvent.ACTION_MOVE:
                         view.setX(event.getRawX() + dX);
@@ -158,7 +158,7 @@ public class HomeActivity extends AppCompatActivity {
                             // 클릭으로 간주
                             view.performClick();
                         }
-                        return true;
+                        return false;
 
                     default:
                         return false;

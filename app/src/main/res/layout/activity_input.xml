@@ -1,6 +1,140 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/scrollView"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#FFFCF4"
+    android:fillViewport="true"
+    android:padding="24dp">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingTop="4dp">
+
+        <!-- 홈 버튼과 타이틀을 가로로 배치 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="12dp"
+            android:layout_marginTop="16dp">
+
+            <ImageButton
+                android:id="@+id/btnHome"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@drawable/ic_home_outline"
+                android:background="@android:color/transparent"
+                android:contentDescription="홈" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="지원 공고문 입력"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:layout_marginLeft="36dp"
+                android:layout_marginRight="36dp" />
+
+            <!-- 오른쪽 공간을 위한 더미 뷰 -->
+            <View
+                android:layout_width="36dp"
+                android:layout_height="36dp" />
+        </LinearLayout>
+
+        <!-- 설명 -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="지원할 공고문을 입력해주세요.\n첨부한 공고문을 AI가 분석하여 지원할 직무를 자동 선정 후 자기소개서를 작성합니다."
+            android:textSize="14sp"
+            android:layout_marginBottom="24dp"
+            android:lineSpacingExtra="4dp"
+            android:gravity="center" />
+
+
+        <!-- 공고문 업로드 -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="공고문 업로드"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp" />
+
+        <!-- 이미지 업로드 박스 -->
+        <LinearLayout
+            android:id="@+id/imageUploadBox"
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
+            android:orientation="vertical"
+            android:background="#FFF6DC"
+            android:gravity="center"
+            android:layout_marginBottom="20dp"
+            android:layout_marginTop="16dp">
+
+            <ImageView
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@drawable/ic_cloud_upload"
+                android:contentDescription="Upload" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="이미지를 선택하세요"
+                android:layout_marginTop="8dp" />
+        </LinearLayout>
+
+        <!-- 이미지 미리보기 목록 -->
+        <LinearLayout
+            android:id="@+id/imageContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginBottom="16dp"/>
+
+        <!-- 텍스트 변환 -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="텍스트로 변환된 지원 공고문(수정 가능)"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp" />
+
+        <EditText
+            android:id="@+id/convertedText"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:background="#FFFDF0"
+            android:gravity="top|start"
+            android:padding="12dp"
+            android:hint="여기에 텍스트 공고문이 표시됩니다."
+            android:inputType="textMultiLine|textCapSentences"
+            android:textColor="#000000"
+            android:textSize="14sp"
+            android:layout_marginBottom="20dp"
+            android:scrollbars="vertical"
+            android:fadingEdge="vertical"
+            android:maxLines="100"
+            android:overScrollMode="always"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:clickable="true"
+            />
+
+        <!-- 생성 버튼 -->
+        <Button
+            android:id="@+id/generateButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="#FFD54F"
+            android:text="생성"
+            android:textColor="#000000"
+            android:textStyle="bold" />
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>
