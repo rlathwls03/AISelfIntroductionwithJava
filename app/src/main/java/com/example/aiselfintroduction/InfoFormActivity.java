@@ -10,6 +10,8 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
+
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.flexbox.FlexboxLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -177,6 +179,7 @@ public class InfoFormActivity extends AppCompatActivity {
             finish();
         });
 
+        findViewById(R.id.certificateHintButton).setOnClickListener(v -> showHintModal("certificate"));
     }
 
 
@@ -209,5 +212,30 @@ public class InfoFormActivity extends AppCompatActivity {
 
         // 저장
         userInfoStorage.saveUserInfo(userInfo);
+    }
+
+    // 힌트 모달 표시 메서드
+    private void showHintModal(String hintType) {
+        String title;
+        String message;
+
+        switch (hintType) {
+            case "certificate":
+                title = "자격증/어학성적 가이드";
+                message = "보유한 자격증이나 어학성적을 입력하세요.\n" +
+                        "예: 정보처리기사, TOEIC 800점, 한국사능력검정시험 1급";
+                break;
+
+            default:
+                title = "도움말";
+                message = "입력 가이드";
+                break;
+        }
+
+        new AlertDialog.Builder(this)
+                .setTitle(title)
+                .setMessage(message)
+                .setPositiveButton("닫기", (dialog, which) -> dialog.dismiss())
+                .show();
     }
 }

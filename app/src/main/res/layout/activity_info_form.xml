@@ -159,14 +159,31 @@
             </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
 
-        <!-- Certificates Input -->
-        <TextView
-            android:layout_width="wrap_content"
+        <!-- Certificates Input with Hint -->
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="자격증/어학성적"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="6dp" />
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="6dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="자격증/어학성적"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <ImageButton
+                android:id="@+id/certificateHintButton"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_marginLeft="4dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_help_outline"
+                android:contentDescription="자격증 도움말"
+                app:tint="#888888" />
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"

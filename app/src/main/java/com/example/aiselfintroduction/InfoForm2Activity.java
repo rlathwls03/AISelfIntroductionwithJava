@@ -21,6 +21,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -616,6 +617,13 @@ public class InfoForm2Activity extends AppCompatActivity {
 
         // 파일 업로드 버튼
         uploadButton.setOnClickListener(v -> handleFileUpload());
+
+        // 힌트 버튼 리스너 추가
+        findViewById(R.id.jobHintButton).setOnClickListener(v -> showHintModal("job"));
+        findViewById(R.id.personalityHintButton).setOnClickListener(v -> showHintModal("personality"));
+        findViewById(R.id.experienceHintButton).setOnClickListener(v -> showHintModal("experience"));
+        findViewById(R.id.sentenceHintButton).setOnClickListener(v -> showHintModal("sentence"));
+
     }
 
     private void addJobChip() {
@@ -644,5 +652,51 @@ public class InfoForm2Activity extends AppCompatActivity {
     private void removeKeywordChip(int position) {
         keywordChips.remove(position);
         keywordChipsAdapter.notifyItemRemoved(position);
+    }
+
+    // 힌트 모달 표시 메서드
+    private void showHintModal(String hintType) {
+        String title;
+        String message;
+
+        switch (hintType) {
+            case "job":
+                title = "경력 사항 가이드";
+                message = "경력이나 근무 경험을 입력하세요.\n" +
+                        "예: 트럭 운송 2년 근무, 기아 생산직 인턴 1년 근무";
+                break;
+
+            case "personality":
+                title = "성격 장단점 가이드";
+                message = "자기소개서에 들어갈 성격의 장단점을 작성하세요.\n" +
+                        "예: 꼼꼼하고 책임감 있는 성격으로 맡은 일은 끝까지 해내는 편입니다.\n" +
+                        "반면, 새로운 환경에 적응하는 데 시간이 조금 걸리지만 다양한 활동을 통해 극복하고 있습니다.";
+                break;
+
+            case "experience":
+                title = "개인 경험 가이드";
+                message = "이전 프로젝트나 업무 관련 경험을 작성하세요.\n" +
+                        "예: 실제 서비스에 배포된 웹 프로젝트에 프론트엔드로 참여한 경험\n" +
+                        "예: 대학생 자율 프로젝트에서 팀장을 맡아 React 기반 웹사이트를 개발했습니다.";
+                break;
+
+            case "sentence":
+                title = "포함할 문장 가이드";
+                message = "자기소개서에 포함하고 싶은 특별한 문장을 작성하세요.\n" +
+                        "예: 문제를 해결할 때 논리적 사고와 빠른 실행력을 바탕으로 접근합니다.\n" +
+                        "예: 협업을 통해 시너지를 내는 것에 가치를 두며, 팀워크에 강한 자신이 있습니다.";
+                break;
+
+            default:
+                title = "도움말";
+                message = "입력 가이드";
+                break;
+        }
+
+        new AlertDialog.Builder(this)
+                .setTitle(title)
+                .setMessage(message)
+                .setPositiveButton("닫기", (dialog, which) -> dialog.dismiss())
+                .show();
     }
 }

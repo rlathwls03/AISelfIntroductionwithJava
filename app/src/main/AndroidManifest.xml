@@ -33,6 +33,7 @@
         <activity
             android:name=".HomeActivity"
             android:exported="true"
+            android:windowSoftInputMode="adjustPan"
             android:launchMode="singleTop" />
 
         <!-- 정보 입력 액티비티들 -->
@@ -54,5 +55,8 @@
             android:name=".InputActivity"
             android:exported="true" />
 
+        <activity
+            android:name=".DownloadActivity"
+            android:exported="true" />
     </application>
 </manifest>

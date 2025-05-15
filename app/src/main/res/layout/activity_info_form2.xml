@@ -46,14 +46,33 @@
                 android:layout_height="24dp" />
         </LinearLayout>
 
-        <!-- 경력 사항 -->
-        <TextView
-            android:layout_width="wrap_content"
+        <!-- 경력 사항 with Hint Button -->
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="경력 사항"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="6dp" />
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="6dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="경력 사항"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <ImageButton
+                android:id="@+id/jobHintButton"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_marginLeft="4dp"
+                android:padding="2dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_help_outline"
+                android:contentDescription="경력사항 도움말"
+                app:tint="#888888"
+                android:scaleType="centerInside" />
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -93,14 +112,33 @@
             android:layout_marginTop="8dp"
             android:layout_marginBottom="16dp" />
 
-        <!-- 성격 장단점 -->
-        <TextView
-            android:layout_width="wrap_content"
+        <!-- 성격 장단점 with Hint Button -->
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="자소서 성격 장단점"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="6dp" />
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="6dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="자소서 성격 장단점"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <ImageButton
+                android:id="@+id/personalityHintButton"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_marginLeft="4dp"
+                android:padding="2dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_help_outline"
+                android:contentDescription="성격 장단점 도움말"
+                app:tint="#888888"
+                android:scaleType="centerInside" />
+        </LinearLayout>
 
         <!-- 성격 장단점 -->
         <EditText
@@ -164,14 +202,33 @@
             android:layout_marginTop="8dp"
             android:layout_marginBottom="16dp" />
 
-        <!-- 개인 경험 -->
-        <TextView
-            android:layout_width="wrap_content"
+        <!-- 개인 경험 with Hint Button -->
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="개인 경험 (이전 프로젝트, 업무 관련)"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="6dp" />
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="6dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="개인 경험 (이전 프로젝트, 업무 관련)"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <ImageButton
+                android:id="@+id/experienceHintButton"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_marginLeft="4dp"
+                android:padding="2dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_help_outline"
+                android:contentDescription="개인 경험 도움말"
+                app:tint="#888888"
+                android:scaleType="centerInside" />
+        </LinearLayout>
 
         <!-- 개인 경험 -->
         <EditText
@@ -188,14 +245,33 @@
             android:minHeight="120dp"
             android:maxHeight="240dp"/>
 
-        <!-- 자소서 문장 -->
-        <TextView
-            android:layout_width="wrap_content"
+        <!-- 자소서 문장 with Hint Button -->
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="자기소개서에 포함하고 싶은 문장"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="6dp" />
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="6dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="자기소개서에 포함하고 싶은 문장"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <ImageButton
+                android:id="@+id/sentenceHintButton"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_marginLeft="4dp"
+                android:padding="2dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_help_outline"
+                android:contentDescription="특별한 문장 도움말"
+                app:tint="#888888"
+                android:scaleType="centerInside" />
+        </LinearLayout>
 
         <!-- 자소서 문장 -->
         <EditText
@@ -227,6 +303,7 @@
             android:layout_height="100dp"
             android:background="@drawable/upload_button_background"
             android:drawableTop="@drawable/ic_cloud_upload"
+            android:drawablePadding="-10dp"
             android:text="파일을 선택하세요"
             android:textColor="#777777"
             android:layout_marginBottom="16dp" />
