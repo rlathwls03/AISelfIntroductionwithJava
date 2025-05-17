@@ -69,6 +69,18 @@ public class SelfIntroAdapter extends RecyclerView.Adapter<SelfIntroAdapter.View
         this.clickListener = listener;
     }
 
+
+    public interface OnDownloadClickListener {
+        void onDownloadClicked(String introTitle);
+    }
+
+    private OnDownloadClickListener downloadClickListener;
+
+    public void setOnDownloadClickListener(OnDownloadClickListener listener) {
+        this.downloadClickListener = listener;
+    }
+
+
     public static class ViewHolder extends RecyclerView.ViewHolder {
         ImageView starIcon, moreIcon, arrowIcon, documentIcon;
         TextView titleText;
@@ -256,13 +268,20 @@ public class SelfIntroAdapter extends RecyclerView.Adapter<SelfIntroAdapter.View
                     // 삭제 - 저장소에서도 제거하도록 수정
                     deleteIntroItem(item, position);
                     return true;
-                } else if (id == R.id.menu_download) { // 다운로드
-                    // 다운로드 로직
-                    if (context instanceof HomeActivity) {
-                        ((HomeActivity) context).navigateToDownload(item.getTitle());
+                } else if (id == R.id.menu_download) {
+                    if (downloadClickListener != null) {
+                        downloadClickListener.onDownloadClicked(item.getTitle());
+                    } else {
+                        // 리스너가 없는 경우 기존 방식으로 분기 처리
+                        if (context instanceof HomeActivity) {
+                            ((HomeActivity) context).navigateToDownload(item.getTitle());
+                        } else if (context instanceof FavoritesActivity) {
+                            ((FavoritesActivity) context).navigateToDownload(item.getTitle());
+                        }
                     }
                     return true;
                 }
+
                 return false;
             });
             popup.show();

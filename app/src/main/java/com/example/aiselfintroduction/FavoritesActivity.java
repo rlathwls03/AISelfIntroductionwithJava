@@ -21,6 +21,8 @@ import com.example.aiselfintroduction.InfoFormActivity;
 import com.example.aiselfintroduction.R;
 import com.example.aiselfintroduction.SelfIntro;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -76,6 +78,13 @@ public class FavoritesActivity extends AppCompatActivity {
             @Override
             public void onItemRename(String oldName, String newName) {
                 handleItemRename(oldName, newName);
+            }
+        });
+
+        adapter.setOnDownloadClickListener(new SelfIntroAdapter.OnDownloadClickListener() {
+            @Override
+            public void onDownloadClicked(String introTitle) {
+                navigateToDownload(introTitle); // 이 메서드 호출
             }
         });
 
@@ -248,6 +257,38 @@ public class FavoritesActivity extends AppCompatActivity {
         } catch (Exception e) {
             Log.e("FavoritesActivity", "저장소 삭제 실패", e);
             showYellowToast("삭제 중 오류가 발생했습니다.");
+        }
+    }
+
+    public void navigateToDownload(String introTitle) {
+        try {
+            // 선택한 자기소개서 데이터 로드
+            SelfIntroData introData = selfIntroStorage.loadSelfIntro(introTitle);
+
+            if (introData == null) {
+                showYellowToast("자기소개서 데이터를 찾을 수 없습니다.");
+                return;
+            }
+
+            // JSON 형태로 변환
+            JsonObject jsonObject = new JsonObject();
+            jsonObject.addProperty("직무역량", introData.get직무역량());
+            jsonObject.addProperty("입사후포부", introData.get입사후포부());
+            jsonObject.addProperty("지원동기", introData.get지원동기());
+            jsonObject.addProperty("성격장단점", introData.get성격장단점());
+
+            String jsonData = new Gson().toJson(jsonObject);
+
+            // 다운로드 액티비티로 이동
+            Intent intent = new Intent(FavoritesActivity.this, DownloadActivity.class);
+            intent.putExtra("resumeTitle", introTitle);
+            intent.putExtra("aiJson", jsonData);
+            startActivity(intent);
+
+            Log.d("HomeActivity", "다운로드 화면으로 이동: " + introTitle);
+        } catch (Exception e) {
+            Log.e("HomeActivity", "다운로드 화면 이동 중 오류", e);
+            showYellowToast("다운로드 준비 중 오류가 발생했습니다.");
         }
     }
 }
