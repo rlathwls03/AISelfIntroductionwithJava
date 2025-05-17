@@ -8,7 +8,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
-import android.widget.ArrayAdapter;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -22,6 +22,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -60,8 +62,43 @@ public class HomeActivity extends AppCompatActivity {
             intro.setFavorite(favorites.contains(intro.getTitle()));
         }
         adapter.notifyDataSetChanged();
+
         // 저장된 자기소개서 목록을 다시 불러와서 전체 리스트 갱신
         refreshIntroList();
+
+        // 최근 편집 항목도 다시 불러와서 업데이트
+        updateRecentIntroDisplay();
+    }
+
+    // 최근 수정된 자기소개서 정보를 불러와 UI에 표시하는 메서드
+    private void updateRecentIntroDisplay() {
+        // SharedPreferences에서 최근 편집 항목 불러오기
+        SharedPreferences prefs = getSharedPreferences("IntroPrefs", MODE_PRIVATE);
+        String recentIntroName = prefs.getString(LAST_EDITED_KEY, null);
+
+        // 항상 recentContainer 보이도록 설정
+        recentContainer.setVisibility(View.VISIBLE);
+
+        // 로그 추가
+        Log.d("HomeActivity", "최근 수정된 자기소개서 업데이트: " + recentIntroName);
+
+        if (recentIntroName != null && !recentIntroName.isEmpty()) {
+            // 최근 편집한 자기소개서가 있는 경우
+            recentText.setText(recentIntroName);
+
+            // 클릭 리스너 설정
+            recentContainer.setOnClickListener(v -> {
+                Intent intent = new Intent(HomeActivity.this, EditListActivity.class);
+                intent.putExtra("resumeTitle", recentIntroName);
+                startActivity(intent);
+                Log.d("HomeActivity", "최근 자기소개서 클릭: " + recentIntroName);
+            });
+        } else {
+            // 최근 편집한 자기소개서가 없는 경우
+            recentText.setText("수정한 자기소개서가 없습니다");
+            // 클릭 비활성화
+            recentContainer.setOnClickListener(null);
+        }
     }
 
     // 자기소개서 리스트 전체 갱신 메서드
@@ -135,10 +172,13 @@ public class HomeActivity extends AppCompatActivity {
             return false;
         });
 
-        // 플로팅 버튼
+        // 플로팅 버튼 터치 리스너 - 개선된 버전
         fabAddIntro.setOnTouchListener(new View.OnTouchListener() {
             float dX, dY;
-            int lastAction;
+            float startX, startY;
+            long startClickTime;
+            final int CLICK_TIME_THRESHOLD = 200;
+            final float CLICK_MOVE_THRESHOLD = 20;
 
             @Override
             public boolean onTouch(View view, android.view.MotionEvent event) {
@@ -146,38 +186,53 @@ public class HomeActivity extends AppCompatActivity {
                     case android.view.MotionEvent.ACTION_DOWN:
                         dX = view.getX() - event.getRawX();
                         dY = view.getY() - event.getRawY();
-                        lastAction = android.view.MotionEvent.ACTION_DOWN;
+                        startX = event.getRawX();
+                        startY = event.getRawY();
+                        startClickTime = System.currentTimeMillis();
+                        view.setAlpha(0.9f);
                         return false;
 
                     case android.view.MotionEvent.ACTION_MOVE:
                         view.setX(event.getRawX() + dX);
                         view.setY(event.getRawY() + dY);
-                        lastAction = android.view.MotionEvent.ACTION_MOVE;
-                        return true;
-
-                    case android.view.MotionEvent.ACTION_UP:
-                        if (lastAction == android.view.MotionEvent.ACTION_DOWN) {
-                            // 클릭으로 간주
-                            view.performClick();
+                        float distanceMoved = distance(startX, startY, event.getRawX(), event.getRawY());
+                        if (distanceMoved > CLICK_MOVE_THRESHOLD) {
+                            return true;
                         }
                         return false;
 
+                    case android.view.MotionEvent.ACTION_UP:
+                    case android.view.MotionEvent.ACTION_CANCEL: // 취소 이벤트도 동일하게 처리
+                        // 항상 알파값을 원래대로 복원
+                        view.setAlpha(1.0f);
+
+                        // ACTION_UP일 때만 클릭 처리
+                        if (event.getActionMasked() == android.view.MotionEvent.ACTION_UP) {
+                            long clickDuration = System.currentTimeMillis() - startClickTime;
+                            float distance = distance(startX, startY, event.getRawX(), event.getRawY());
+
+                            if (clickDuration < CLICK_TIME_THRESHOLD && distance < CLICK_MOVE_THRESHOLD) {
+                                view.performClick();
+                                return false;
+                            }
+                        }
+
+                        // 항상 true 반환하여 이벤트 소비
+                        return true;
+
                     default:
+                        // 알파값 복원 추가
+                        view.setAlpha(1.0f);
                         return false;
                 }
             }
-        });
 
-        // RecyclerView 초기화
-//        introList = new ArrayList<>();
-//        introList.add(new SelfIntro("테스트 자기소개서1", true));
-//        introList.add(new SelfIntro("백엔드 개발자 지원서", false));
-//        introList.add(new SelfIntro("프론트엔드 인턴 지원", false));
-//        introList.add(new SelfIntro("백엔드 개발자 지원서2", false));
-//        introList.add(new SelfIntro("프론트엔드 인턴 지원2", false));
-//        introList.add(new SelfIntro("테스트 자기소개서2", true));
-//        introList.add(new SelfIntro("백엔드 개발자 지원서3", false));
-//        introList.add(new SelfIntro("프론트엔드 인턴 지원3", false));
+            private float distance(float x1, float y1, float x2, float y2) {
+                float dx = x2 - x1;
+                float dy = y2 - y1;
+                return (float) Math.sqrt(dx * dx + dy * dy);
+            }
+        });
 
         // RecyclerView 초기화 - 저장된 데이터 우선 로드
         introList = new ArrayList<>();
@@ -197,8 +252,10 @@ public class HomeActivity extends AppCompatActivity {
         } else {
             // 저장된 데이터가 없으면 더미 데이터 생성 및 저장
             Log.d("HomeActivity", "저장된 데이터가 없어 더미 데이터 생성");
-            createAndSaveDummyData(favorites);
+            // 더미 데이터 생성 대신 안내 메시지 추가 (아래에 코드 추가)
+//            showEmptyStateUI();
         }
+
 
         adapter = new SelfIntroAdapter(this, introList);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -210,8 +267,8 @@ public class HomeActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        // 즐겨찾기 항목
-//        introList.add(new SelfIntro("테스트 자기소개서", favorites.contains("테스트 자기소개서")));
+        // 최근 수정 항목 표시 메서드 호출 (기존 코드를 이 한 줄로 대체)
+        updateRecentIntroDisplay();
 
         // 최근 항목 불러오기
         String recentIntroName = prefs.getString(LAST_EDITED_KEY, null);
@@ -221,10 +278,14 @@ public class HomeActivity extends AppCompatActivity {
 
         if (recentIntroName != null && !recentIntroName.isEmpty()) {
             recentText.setText(recentIntroName);
+
             recentContainer.setOnClickListener(v -> {
-                Intent intent = new Intent(HomeActivity.this, SelfIntroDetailActivity.class);
-                intent.putExtra("introName", recentIntroName);
+                Intent intent = new Intent(HomeActivity.this, EditListActivity.class);
+                intent.putExtra("resumeTitle", recentIntroName);
                 startActivity(intent);
+
+                // 로그 추가
+                Log.d("HomeActivity", "최근 자기소개서 클릭: " + recentIntroName);
             });
         } else {
             recentText.setText("수정한 자기소개서가 없습니다");
@@ -242,85 +303,121 @@ public class HomeActivity extends AppCompatActivity {
 
         // 처음 진입시 안내 애니메이션 호출 추가
         fabAddIntro.postDelayed(() -> {
-            showFirstTimeHint();
-        }, 500);
+            showCreateIntroGuide();
+        }, 1000);
     }
 
     // 3. 처음 진입시 안내 애니메이션 메서드 추가
-    /**
-     * 처음 앱을 실행한 사용자에게 플로팅 버튼의 용도를 안내하는 애니메이션
-     */
-    private void showFirstTimeHint() {
-        SharedPreferences prefs = getSharedPreferences("IntroPrefs", MODE_PRIVATE);
-        boolean isFirstTime = prefs.getBoolean("FIRST_TIME_HOME", true);
+    private void showCreateIntroGuide() {
+        // SharedPreferences 체크를 제거하고 항상 가이드를 보여주도록 수정
 
-        Log.d("HomeActivity", "showFirstTimeHint 호출됨, isFirstTime: " + isFirstTime);
+        // 1. 반투명 텍스트 뷰 생성
+        TextView guideText = new TextView(this);
+        guideText.setText("자기소개서 생성");
+        guideText.setTextColor(Color.WHITE);
+        guideText.setBackgroundResource(R.drawable.rounded_toast_bg);
+        guideText.setPadding(30, 10, 100, 10);
+        guideText.setTextSize(16);
 
-        if (isFirstTime) {
-            // 뷰가 완전히 로드된 후 애니메이션 실행
-            fabAddIntro.post(() -> {
-                Log.d("HomeActivity", "애니메이션 시작");
+        // 2. 최상위 레이아웃(FrameLayout)에 추가
+        FrameLayout rootLayout = (FrameLayout) findViewById(android.R.id.content);
 
-                // 플로팅 버튼 주위에 파동 효과
-                ObjectAnimator scaleX = ObjectAnimator.ofFloat(fabAddIntro, "scaleX", 1f, 1.3f, 1f);
-                ObjectAnimator scaleY = ObjectAnimator.ofFloat(fabAddIntro, "scaleY", 1f, 1.3f, 1f);
+        // 상대적 위치 파라미터 설정
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.WRAP_CONTENT,
+                FrameLayout.LayoutParams.WRAP_CONTENT
+        );
+        rootLayout.addView(guideText, params);
 
-                scaleX.setDuration(600);
-                scaleY.setDuration(600);
-                scaleX.setRepeatCount(3);
-                scaleY.setRepeatCount(3);
-                scaleX.setInterpolator(new AccelerateDecelerateInterpolator());
-                scaleY.setInterpolator(new AccelerateDecelerateInterpolator());
+        // 3. 플로팅 버튼 위치 기준으로 텍스트 위치 조정
+        fabAddIntro.post(() -> {
+            int[] location = new int[2];
+            fabAddIntro.getLocationInWindow(location);
 
-                scaleX.start();
-                scaleY.start();
-            });
+            guideText.setX(location[0] - guideText.getWidth() / 2 + fabAddIntro.getWidth() / 2);
+            guideText.setY(location[1] - guideText.getHeight() - 20); // 버튼 위 20px
 
-            // 첫 방문 표시 저장
-            prefs.edit().putBoolean("FIRST_TIME_HOME", false).apply();
-            Log.d("HomeActivity", "첫 방문 표시 저장됨");
-        }
+            // 4. 텍스트 페이드인 애니메이션
+            guideText.setAlpha(0f);
+            guideText.animate()
+                    .alpha(1f)
+                    .setDuration(500)
+                    .start();
+
+            // 5. 버튼 애니메이션
+            ObjectAnimator scaleX = ObjectAnimator.ofFloat(fabAddIntro, "scaleX", 1f, 1.2f, 1f);
+            ObjectAnimator scaleY = ObjectAnimator.ofFloat(fabAddIntro, "scaleY", 1f, 1.2f, 1f);
+
+            scaleX.setDuration(500);
+            scaleY.setDuration(500);
+            scaleX.setRepeatCount(2); // 총 3회 반복
+            scaleY.setRepeatCount(2);
+            scaleX.setInterpolator(new AccelerateDecelerateInterpolator());
+            scaleY.setInterpolator(new AccelerateDecelerateInterpolator());
+
+            scaleX.start();
+            scaleY.start();
+
+            // 6. 3초 후 가이드 제거
+            rootLayout.postDelayed(() -> {
+                guideText.animate()
+                        .alpha(0f)
+                        .setDuration(500)
+                        .withEndAction(() -> rootLayout.removeView(guideText))
+                        .start();
+
+                // SharedPreferences 저장 코드 제거
+            }, 3000);
+        });
+
+        // 노란색 토스트도 함께 표시 (선택적)
+        // showYellowToast("플로팅 버튼을 눌러 자기소개서를 추가해보세요!");
     }
 
     // 더미 데이터 생성 및 저장 메서드
     private void createAndSaveDummyData(Set<String> favorites) {
-        String[] dummyTitles = {
-                "테스트 자기소개서1",
-                "백엔드 개발자 지원서",
-                "프론트엔드 인턴 지원",
-                "백엔드 개발자 지원서2",
-                "프론트엔드 인턴 지원2",
-                "테스트 자기소개서2",
-                "백엔드 개발자 지원서3",
-                "프론트엔드 인턴 지원3"
-        };
+//        String[] dummyTitles = {
+//                "테스트 자기소개서1",
+//                "백엔드 개발자 지원서",
+//                "프론트엔드 인턴 지원",
+//                "백엔드 개발자 지원서2",
+//                "프론트엔드 인턴 지원2",
+//                "테스트 자기소개서2",
+//                "백엔드 개발자 지원서3",
+//                "프론트엔드 인턴 지원3"
+//        };
 
-        boolean[] dummyFavorites = {true, false, false, false, false, true, false, false};
+//        boolean[] dummyFavorites = {true, false, false, false, false, true, false, false};
 
-        for (int i = 0; i < dummyTitles.length; i++) {
-            // SelfIntroData 생성 및 저장
-            SelfIntroData dummyData = new SelfIntroData(
-                    "직무역량 내용을 입력하세요.",
-                    "입사후포부 내용을 입력하세요.",
-                    "지원동기 내용을 입력하세요.",
-                    "성격장단점 내용을 입력하세요."
-            );
+//        for (int i = 0; i < dummyTitles.length; i++) {
+//            // SelfIntroData 생성 및 저장
+//            SelfIntroData dummyData = new SelfIntroData(
+//                    "직무역량 내용을 입력하세요.",
+//                    "입사후포부 내용을 입력하세요.",
+//                    "지원동기 내용을 입력하세요.",
+//                    "성격장단점 내용을 입력하세요."
+//            );
+//
+//            // 저장소에 저장
+//            selfIntroStorage.saveSelfIntro(dummyTitles[i], dummyData);
+//
+//            // UI 리스트에 추가
+//            introList.add(new SelfIntro(dummyTitles[i], dummyFavorites[i]));
+//
+//            // 즐겨찾기 항목이면 SharedPreferences에도 저장
+//            if (dummyFavorites[i]) {
+//                favorites.add(dummyTitles[i]);
+//            }
+//        }
 
-            // 저장소에 저장
-            selfIntroStorage.saveSelfIntro(dummyTitles[i], dummyData);
+//        // 즐겨찾기 목록 저장
+//        SharedPreferences prefs = getSharedPreferences("IntroPrefs", MODE_PRIVATE);
+//        prefs.edit().putStringSet("FAVORITE_INTROS", favorites).apply();
+        // 더미 데이터를 생성하지 않고 빈 구현으로 변경
+        Log.d("HomeActivity", "더미 데이터 생성 비활성화됨");
 
-            // UI 리스트에 추가
-            introList.add(new SelfIntro(dummyTitles[i], dummyFavorites[i]));
-
-            // 즐겨찾기 항목이면 SharedPreferences에도 저장
-            if (dummyFavorites[i]) {
-                favorites.add(dummyTitles[i]);
-            }
-        }
-
-        // 즐겨찾기 목록 저장
-        SharedPreferences prefs = getSharedPreferences("IntroPrefs", MODE_PRIVATE);
-        prefs.edit().putStringSet("FAVORITE_INTROS", favorites).apply();
+        // 안내 메시지 표시
+        showYellowToast("플로팅 버튼을 눌러 자기소개서를 추가해보세요!");
     }
 
     // 이름 변경 처리 함수
@@ -434,9 +531,9 @@ public class HomeActivity extends AppCompatActivity {
 
             // 2. 최근 편집 항목이 삭제된 자기소개서면 제거
             SharedPreferences prefs = getSharedPreferences("IntroPrefs", MODE_PRIVATE);
-            String recentIntro = prefs.getString(LAST_EDITED_KEY, null);
+            String recentIntro = prefs.getString(HomeActivity.LAST_EDITED_KEY, null);
             if (title.equals(recentIntro)) {
-                prefs.edit().remove(LAST_EDITED_KEY).apply();
+                prefs.edit().remove(HomeActivity.LAST_EDITED_KEY).apply();
                 recentText.setText("수정한 자기소개서가 없습니다");
                 recentContainer.setOnClickListener(null);
             }
@@ -447,6 +544,39 @@ public class HomeActivity extends AppCompatActivity {
         } catch (Exception e) {
             Log.e("HomeActivity", "저장소 삭제 실패", e);
             showYellowToast("삭제 중 오류가 발생했습니다.");
+        }
+    }
+
+    // HomeActivity.java에 추가
+    public void navigateToDownload(String introTitle) {
+        try {
+            // 선택한 자기소개서 데이터 로드
+            SelfIntroData introData = selfIntroStorage.loadSelfIntro(introTitle);
+
+            if (introData == null) {
+                showYellowToast("자기소개서 데이터를 찾을 수 없습니다.");
+                return;
+            }
+
+            // JSON 형태로 변환
+            JsonObject jsonObject = new JsonObject();
+            jsonObject.addProperty("직무역량", introData.get직무역량());
+            jsonObject.addProperty("입사후포부", introData.get입사후포부());
+            jsonObject.addProperty("지원동기", introData.get지원동기());
+            jsonObject.addProperty("성격장단점", introData.get성격장단점());
+
+            String jsonData = new Gson().toJson(jsonObject);
+
+            // 다운로드 액티비티로 이동
+            Intent intent = new Intent(HomeActivity.this, DownloadActivity.class);
+            intent.putExtra("resumeTitle", introTitle);
+            intent.putExtra("aiJson", jsonData);
+            startActivity(intent);
+
+            Log.d("HomeActivity", "다운로드 화면으로 이동: " + introTitle);
+        } catch (Exception e) {
+            Log.e("HomeActivity", "다운로드 화면 이동 중 오류", e);
+            showYellowToast("다운로드 준비 중 오류가 발생했습니다.");
         }
     }
 }

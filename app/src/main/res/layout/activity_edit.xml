@@ -19,12 +19,12 @@
         app:layout_constraintEnd_toEndOf="parent">
 
         <ImageButton
-            android:id="@+id/btnClose"
+            android:id="@+id/btnBack"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@android:color/transparent"
             android:src="@drawable/ic_arrow_back"
-            android:contentDescription="닫기" />
+            android:contentDescription="뒤로가기" />
 
         <TextView
             android:layout_width="0dp"

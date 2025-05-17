@@ -3,6 +3,7 @@ package com.example.aiselfintroduction;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -40,9 +41,16 @@ public class EditSingleActivity extends AppCompatActivity {
 
         // X 버튼 누르면 화면 종료
         btnClose.setOnClickListener(v -> {
+            // 원래 자기소개서 제목을 다시 EditListActivity로 전달
+            String resumeTitle = getIntent().getStringExtra("resumeTitle");
+
+            // 로그 추가
+            Log.d("EditSingleActivity", "닫기 버튼: 원래 제목으로 돌아가기 - " + resumeTitle);
+
             Intent intent = new Intent(EditSingleActivity.this, EditListActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP); // 스택 초기화 (중복 방지)
-            startActivity(intent);
+            if (resumeTitle != null && !resumeTitle.isEmpty()) {
+                intent.putExtra("resumeTitle", resumeTitle);
+            }startActivity(intent);
             finish();
         });
     }

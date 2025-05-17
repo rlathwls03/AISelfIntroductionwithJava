@@ -22,7 +22,7 @@
         <!-- 메인 진입점 액티비티 -->
         <!-- 스플래시 액티비티를 LAUNCHER로 설정 -->
         <activity
-            android:name=".EditListActivity"
+            android:name=".SplashActivity"
             android:theme="@style/SplashTheme"
             android:exported="true">
             <intent-filter>
@@ -70,7 +70,7 @@
             android:exported="true" />
 
         <activity
-            android:name=".SplashActivity"
+            android:name=".EditListActivity"
             android:exported="true"
             android:windowSoftInputMode="adjustPan"/>
 

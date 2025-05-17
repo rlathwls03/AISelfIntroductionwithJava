@@ -1,14 +1,20 @@
 package com.example.aiselfintroduction;
 
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.print.PrintAttributes;
 import android.print.PrintManager;
+import android.util.Log;
+import android.view.Gravity;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -47,14 +53,20 @@ public class DownloadActivity extends AppCompatActivity {
         if (aiJson != null) {
             try {
                 JsonObject json = new Gson().fromJson(aiJson, JsonObject.class);
+
+                // 디버그용 로그 추가
+                android.util.Log.d("DownloadActivity", "받은 JSON: " + aiJson);
+                android.util.Log.d("DownloadActivity", "받은 제목: " + resumeTitle);
+
+                // JSON 키 검사
                 if (json.has("직무역량"))
                     sectionMap.put("직무 역량", json.get("직무역량").getAsString());
                 if (json.has("입사후포부"))
                     sectionMap.put("입사 후 포부", json.get("입사후포부").getAsString());
                 if (json.has("지원동기"))
                     sectionMap.put("지원 동기", json.get("지원동기").getAsString());
-                if (json.has("성격의장단점"))
-                    sectionMap.put("성격의 장단점", json.get("성격의장단점").getAsString());
+                if (json.has("성격장단점"))
+                    sectionMap.put("성격의 장단점", json.get("성격장단점").getAsString());
             } catch (Exception e) {
                 Toast.makeText(this, "AI 데이터 파싱 오류", Toast.LENGTH_SHORT).show();
             }
@@ -80,42 +92,103 @@ public class DownloadActivity extends AppCompatActivity {
         });
     }
 
+    private void showYellowToast(String message) {
+        try {
+            // 커스텀 레이아웃 생성
+            LinearLayout layout = new LinearLayout(this);
+            layout.setOrientation(LinearLayout.HORIZONTAL);
+            layout.setPadding(40, 20, 40, 20);
+
+            // 노란색 배경 설정
+            GradientDrawable shape = new GradientDrawable();
+            shape.setColor(Color.parseColor("#FCD965"));
+            shape.setCornerRadius(30);
+            layout.setBackground(shape);
+
+            // 텍스트 뷰 생성
+            TextView textView = new TextView(this);
+            textView.setText(message);
+            textView.setTextColor(Color.BLACK);
+            textView.setTextSize(16);
+            textView.setGravity(Gravity.CENTER);
+            layout.addView(textView);
+
+            // 토스트 생성
+            Toast toast = new Toast(this);
+            toast.setDuration(Toast.LENGTH_SHORT);
+            toast.setView(layout);
+            toast.setGravity(Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL, 0, 150);
+            toast.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+        }
+    }
+
     private void showPdfPreview() {
-        PrintManager printManager = (PrintManager) getSystemService(PRINT_SERVICE);
-        PrintAttributes.Builder builder = new PrintAttributes.Builder();
-        builder.setMediaSize(PrintAttributes.MediaSize.ISO_A4);
+        try {
+            // 먼저 토스트 메시지 표시
+            showYellowToast("PDF 다운로드 준비 중...");
 
-        String jobName = introName + "_자기소개서";
+            // 약간의 딜레이 후 프린트 작업 실행
+            new android.os.Handler().postDelayed(() -> {
+                try {
+                    PrintManager printManager = (PrintManager) getSystemService(PRINT_SERVICE);
+                    PrintAttributes.Builder builder = new PrintAttributes.Builder();
+                    builder.setMediaSize(PrintAttributes.MediaSize.ISO_A4);
 
-        printManager.print(jobName,
-                webView.createPrintDocumentAdapter(jobName),
-                builder.build());
+                    String jobName = introName + "_자기소개서";
 
-        Toast.makeText(this, "PDF 다운로드 준비 중...", Toast.LENGTH_SHORT).show();
+                    printManager.print(jobName,
+                            webView.createPrintDocumentAdapter(jobName),
+                            builder.build());
+                } catch (Exception e) {
+                    Log.e("DownloadActivity", "PDF 미리보기 오류", e);
+                    showYellowToast("PDF 준비 중 오류가 발생했습니다.");
+                }
+            }, 200); // 200ms 딜레이
+        } catch (Exception e) {
+            Log.e("DownloadActivity", "토스트 표시 오류", e);
+            // 기본 토스트로 폴백
+            Toast.makeText(this, "PDF 다운로드 준비 중...", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private String generateHtml() {
         StringBuilder html = new StringBuilder();
         html.append("<html><head><meta charset='UTF-8'><style>");
-        html.append("body { font-family: 'sans-serif'; padding: 40px; font-size: 15px; color: #333; }");
-        html.append("h1 { text-align: left; font-size: 22px; margin-bottom: 30px; }");
-        html.append(".section { margin-bottom: 24px; }");
-        html.append(".section-title { font-size: 16px; font-weight: bold; color: #f4b400; margin-bottom: 6px; }");
-        html.append(".section-text { font-size: 14px; line-height: 1.6; }");
-        html.append(".divider { border-bottom: 1px solid #ccc; margin-top: 12px; }");
+        html.append("body { font-family: Arial, sans-serif; padding: 30px; font-size: 14px; color: #000; }");
+        html.append("h1 { text-align: center; font-size: 20px; margin-bottom: 40px; }");
+        html.append("table { width: 100%; border-collapse: collapse; }");
+        html.append("tr { border: 1px solid #888; }");
+        html.append("td { border: 1px solid #888; padding: 10px; vertical-align: top; }");
+        html.append(".title-cell { font-weight: bold; background-color: #f4b400; }");
         html.append("</style></head><body>");
 
         html.append("<h1>").append(introName).append("</h1>");
 
+        html.append("<table>");
+
         for (Map.Entry<String, String> entry : sectionMap.entrySet()) {
-            html.append("<div class='section'>");
-            html.append("<div class='section-title'>").append(entry.getKey()).append("</div>");
-            html.append("<div class='section-text'>").append(entry.getValue()).append("</div>");
-            html.append("<div class='divider'></div>");
-            html.append("</div>");
+            // 제목 행
+            html.append("<tr>");
+            html.append("<td class=\"title-cell\">").append(entry.getKey()).append("</td>");
+            html.append("</tr>");
+
+            // 내용 행
+            html.append("<tr>");
+            // 줄바꿈을 <br> 태그로 변환
+            String content = entry.getValue().replace("\n", "<br/>");
+            html.append("<td>").append(content).append("</td>");
+            html.append("</tr>");
         }
 
+        html.append("</table>");
         html.append("</body></html>");
+
+        // 로그로 생성된, HTML 확인 (디버깅용)
+        Log.d("DownloadActivity", "생성된 HTML: " + html.toString().substring(0, Math.min(200, html.length())) + "...");
+
         return html.toString();
     }
 }

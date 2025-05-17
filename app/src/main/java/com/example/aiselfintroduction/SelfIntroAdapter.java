@@ -46,14 +46,25 @@ public class SelfIntroAdapter extends RecyclerView.Adapter<SelfIntroAdapter.View
 
     private OnItemRenameListener renameListener;
 
+    // 아이템 클릭 인터페이스 추가
+    public interface OnItemClickListener {
+        void onItemClick(String title);
+    }
+
+    private OnItemClickListener clickListener;
+
     public SelfIntroAdapter(Context context, List<SelfIntro> list) {
         this.context = context;
         this.selfIntroList = list;
         this.prefs = context.getSharedPreferences("IntroPrefs", Context.MODE_PRIVATE);
     }
-
     public void setOnItemRenameListener(OnItemRenameListener listener) {
         this.renameListener = listener;
+    }
+
+    // 아이템 클릭 리스너 설정 메서드 추가
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        this.clickListener = listener;
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -162,8 +173,10 @@ public class SelfIntroAdapter extends RecyclerView.Adapter<SelfIntroAdapter.View
         // 제목 클릭 시 상세 화면으로 이동 (편집 중이 아닐 때만)
         holder.titleText.setOnClickListener(v -> {
             if (!holder.isEditing) {
-                Intent intent = new Intent(context, SelfIntroDetailActivity.class);
-                intent.putExtra("introName", item.getTitle());
+                String title = item.getTitle();
+
+                Intent intent = new Intent(context, EditListActivity.class);
+                intent.putExtra("resumeTitle", title);
                 context.startActivity(intent);
 
                 // 최근 편집 항목으로 저장
@@ -221,6 +234,9 @@ public class SelfIntroAdapter extends RecyclerView.Adapter<SelfIntroAdapter.View
                     return true;
                 } else if (id == R.id.menu_download) { // 다운로드
                     // 다운로드 로직
+                    if (context instanceof HomeActivity) {
+                        ((HomeActivity) context).navigateToDownload(item.getTitle());
+                    }
                     return true;
                 }
                 return false;

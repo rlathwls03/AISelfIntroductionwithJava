@@ -116,56 +116,56 @@
         android:overScrollMode="ifContentScrolls" />
 
     <!-- 최근 작업 텍스트 -->
-    <LinearLayout
-        android:id="@+id/recentContainer"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_marginTop="12dp"
-        android:layout_marginBottom="20dp">
-
-        <TextView
-            android:id="@+id/recentTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="📄 최근 수정한 자기소개서"
-            android:textSize="14sp"
-            android:textColor="#000"
-            android:layout_marginBottom="4dp" />
-
         <LinearLayout
-            android:id="@+id/recentCard"
-            android:layout_width="match_parent"
+            android:id="@+id/recentContainer"
+            android:layout_width="313dp"
             android:layout_height="wrap_content"
-            android:padding="12dp"
-            android:layout_marginLeft="16dp"
-            android:layout_marginRight="36dp"
-            android:background="@drawable/recent_bg"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
-
-            <ImageView
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:src="@drawable/ic_document" />
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="20dp"
+            android:orientation="vertical">
 
             <TextView
-                android:id="@+id/recentText"
-                android:layout_width="0dp"
+                android:id="@+id/recentTitle"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="지원서 이름"
-                android:textSize="14sp"
+                android:layout_marginBottom="4dp"
+                android:text="📄 최근 수정한 자기소개서"
                 android:textColor="#000"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp" />
+                android:textSize="14sp" />
 
-            <ImageView
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:src="@drawable/ic_arrow_right" />
+            <LinearLayout
+                android:id="@+id/recentCard"
+                android:layout_width="230dp"
+                android:layout_height="50dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="36dp"
+                android:background="@drawable/recent_bg"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="12dp">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_document" />
+
+                <TextView
+                    android:id="@+id/recentText"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_weight="1"
+                    android:text="지원서 이름"
+                    android:textColor="#000"
+                    android:textSize="14sp" />
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_arrow_right" />
+            </LinearLayout>
         </LinearLayout>
-    </LinearLayout>
     </LinearLayout>
 
     <!-- 플로팅 버튼 -->

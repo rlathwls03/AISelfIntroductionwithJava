@@ -95,6 +95,14 @@ public class InputActivity extends AppCompatActivity {
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
             startActivity(intent);
         });
+
+        // 홈 버튼
+        generateButton.setOnClickListener(v -> {
+            Intent intent = new Intent(InputActivity.this, EditListActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+            finish();
+        });
     }
 
     private void openImagePicker() {

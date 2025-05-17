@@ -41,7 +41,8 @@
             android:id="@+id/btnHome"
             android:layout_width="36dp"
             android:layout_height="36dp"
-            android:src="@drawable/ic_home"
+            android:src="@drawable/ic_home_outline"
+            android:layout_marginRight="10dp"
             android:background="@android:color/transparent"
             android:contentDescription="홈" />
     </LinearLayout>

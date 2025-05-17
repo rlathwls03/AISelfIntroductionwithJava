@@ -1,12 +1,19 @@
 package com.example.aiselfintroduction;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.graphics.Rect;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.Gravity;
 import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,8 +34,10 @@ public class EditActivity extends AppCompatActivity {
     private TextView btnSave;
     private TextView sectionTitle;
     private ImageView dot1, dot2, dot3, dot4;
+    private ImageButton btnBack;
 
     private List<IntroSection> sections = new ArrayList<>();
+    private SelfIntroStorage selfIntroStorage; // 자기소개서 저장소 추가
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +45,9 @@ public class EditActivity extends AppCompatActivity {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit);
+
+        // 자기소개서 저장소 초기화
+        selfIntroStorage = new SelfIntroStorage(this);
 
         viewPager = findViewById(R.id.viewPager);
         editTitle = findViewById(R.id.editTitle);
@@ -45,6 +57,7 @@ public class EditActivity extends AppCompatActivity {
         dot2 = findViewById(R.id.dot2);
         dot3 = findViewById(R.id.dot3);
         dot4 = findViewById(R.id.dot4);
+        btnBack = findViewById(R.id.btnBack);
 
         // 제목 초기화
         String resumeTitle = getIntent().getStringExtra("resumeTitle");
@@ -92,6 +105,29 @@ public class EditActivity extends AppCompatActivity {
             }
         });
 
+        // 뒤로가기 버튼 클릭 리스너 추가
+        btnBack.setOnClickListener(v -> {
+            // 현재 입력된 제목 가져오기
+            String currentTitle = editTitle.getText().toString().trim();
+
+            // 원래 제목 가져오기
+            String originalTitle = getIntent().getStringExtra("resumeTitle");
+
+            // 전달할 제목 결정 (입력된 제목이 있으면 사용, 없으면 원래 제목 사용)
+            String titleToPass = currentTitle.isEmpty() ?
+                    (originalTitle != null ? originalTitle : "AI 자기소개서") :
+                    currentTitle;
+
+            Log.d("EditActivity", "하드웨어 뒤로가기: 제목 전달 - " + titleToPass);
+
+            // EditListActivity로 이동하면서 제목 전달
+            Intent intent = new Intent(EditActivity.this, EditListActivity.class);
+            intent.putExtra("resumeTitle", titleToPass);
+            startActivity(intent);
+            finish();
+        });
+
+        // 저장 버튼 클릭 리스너
         btnSave.setOnClickListener(v -> {
             String title = editTitle.getText().toString().trim();
             if (title.isEmpty()) {
@@ -99,16 +135,60 @@ public class EditActivity extends AppCompatActivity {
                 return;
             }
 
+            // 제목이 변경되었는지 확인
+            String originalTitle = getIntent().getStringExtra("resumeTitle");
+            boolean isTitleChanged = originalTitle != null && !originalTitle.isEmpty() && !originalTitle.equals(title);
+
+            // 자기소개서 내용을 JSON으로 변환
             JsonObject resultJson = new JsonObject();
             for (IntroSection section : sections) {
                 String key = convertToJsonKey(section.getTitle());
                 resultJson.addProperty(key, section.getContent());
             }
 
-            Intent intent = new Intent(EditActivity.this, DownloadActivity.class);
+            // SelfIntroData 객체로 변환
+            SelfIntroData introData = new SelfIntroData(
+                    getContentForKey(resultJson, "직무역량"),
+                    getContentForKey(resultJson, "입사후포부"),
+                    getContentForKey(resultJson, "지원동기"),
+                    getContentForKey(resultJson, "성격장단점")
+            );
+
+            // 저장 로직 처리
+            if (isTitleChanged) {
+                // 이름이 변경된 경우 renameSelfIntro 메서드 사용
+                Log.d("EditActivity", "자기소개서 이름 변경: " + originalTitle + " → " + title);
+                boolean success = selfIntroStorage.renameSelfIntro(originalTitle, introData, title);
+
+                if (!success) {
+                    // 이름 변경 실패 시 단순 저장
+                    selfIntroStorage.saveSelfIntro(title, introData);
+
+                    // 기존 데이터 삭제 시도
+                    try {
+                        selfIntroStorage.deleteSelfIntro(originalTitle);
+                    } catch (Exception e) {
+                        Log.e("EditActivity", "기존 자기소개서 삭제 실패: " + originalTitle, e);
+                    }
+                }
+            } else {
+                // 이름 변경이 없는 경우 일반 저장
+                selfIntroStorage.saveSelfIntro(title, introData);
+            }
+
+            // 최근 편집 자기소개서 기록
+            SharedPreferences prefs = getSharedPreferences("IntroPrefs", MODE_PRIVATE);
+            prefs.edit().putString(HomeActivity.LAST_EDITED_KEY, title).apply();
+
+            // 저장 완료 토스트 메시지
+            showSafeToast("저장되었습니다.");
+
+            // EditListActivity로 돌아가기
+            Intent intent = new Intent(EditActivity.this, EditListActivity.class);
             intent.putExtra("resumeTitle", title);
-            intent.putExtra("aiJson", resultJson.toString());
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
+            finish();
         });
 
         // 키보드 올라올 때 ViewPager 안 가려지도록 자동 스크롤
@@ -125,8 +205,25 @@ public class EditActivity extends AppCompatActivity {
         });
     }
 
+    // JSON 키에서 내용 가져오기 (없으면 빈 문자열)
+    private String getContentForKey(JsonObject json, String key) {
+        return json.has(key) ? json.get(key).getAsString() : "";
+    }
+
     private String convertToJsonKey(String title) {
-        return title.replaceAll("\\s", "");
+        // 디버그 로그 추가
+        Log.d("EditActivity", "변환 전 키: " + title);
+
+        // 특수 케이스 처리: "성격의 장단점"은 "성격장단점"으로 변환
+        if (title.equals("성격의 장단점")) {
+            Log.d("EditActivity", "성격의 장단점을 성격장단점으로 변환");
+            return "성격장단점";
+        }
+
+        // 일반적인 경우: 공백 제거
+        String result = title.replaceAll("\\s", "");
+        Log.d("EditActivity", "변환 후 키: " + result);
+        return result;
     }
 
     private void updateTitleAndDots(int position) {
@@ -138,5 +235,45 @@ public class EditActivity extends AppCompatActivity {
         dot2.setImageResource(position == 1 ? R.drawable.dot_selected : R.drawable.dot_unselected);
         dot3.setImageResource(position == 2 ? R.drawable.dot_selected : R.drawable.dot_unselected);
         dot4.setImageResource(position == 3 ? R.drawable.dot_selected : R.drawable.dot_unselected);
+    }
+
+    // 노란색 커스텀 Toast를 위한 안전한 메서드
+    private void showYellowToast(String message) {
+        try {
+            // 커스텀 레이아웃 생성
+            LinearLayout layout = new LinearLayout(this);
+            layout.setOrientation(LinearLayout.HORIZONTAL);
+            layout.setPadding(40, 20, 40, 20);
+
+            // 노란색 배경 설정
+            GradientDrawable shape = new GradientDrawable();
+            shape.setColor(Color.parseColor("#FCD965")); // 시그니처 노란색
+            shape.setCornerRadius(30);
+            layout.setBackground(shape);
+
+            // 텍스트 뷰 생성
+            TextView textView = new TextView(this);
+            textView.setText(message);
+            textView.setTextColor(Color.BLACK);
+            textView.setTextSize(16);
+            textView.setGravity(Gravity.CENTER);
+            layout.addView(textView);
+
+            // 토스트 생성
+            Toast toast = new Toast(this);
+            toast.setDuration(Toast.LENGTH_SHORT);
+            toast.setView(layout);
+            toast.setGravity(Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL, 0, 150);
+            toast.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+            // 실패 시 기본 토스트
+            Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    // 기존 showSafeToast를 showYellowToast로 변경
+    private void showSafeToast(String message) {
+        showYellowToast(message);
     }
 }
