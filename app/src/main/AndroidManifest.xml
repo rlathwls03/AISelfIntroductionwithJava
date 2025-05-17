@@ -58,7 +58,8 @@
 
         <activity
             android:name=".FavoritesActivity"
-            android:exported="true" />
+            android:exported="true"
+            android:windowSoftInputMode="adjustPan"/>
 
         <activity
             android:name=".InputActivity"
