@@ -13,5 +13,10 @@
 
         <!-- Status bar color. -->
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
+
+        <!-- 팝업 메뉴 스타일 적용 -->
+        <item name="popupMenuStyle">@style/CustomPopupMenu</item>
+        <item name="android:textAppearance">@style/PopupMenuTextStyle</item>
+        <item name="android:dropDownListViewStyle">@style/PopupMenuListView</item>
     </style>
 </resources>

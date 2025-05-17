@@ -67,6 +67,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="이름"
+                android:textSize="15sp"
                 android:inputType="textPersonName" />
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -82,6 +83,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="전화번호"
+                android:textSize="15sp"
                 android:inputType="phone" />
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -97,6 +99,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="이메일"
+                android:textSize="15sp"
                 android:inputType="textEmailAddress" />
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -105,7 +108,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="최종 학력"
-            android:textSize="14sp"
+            android:textSize="15sp"
             android:textStyle="bold"
             android:layout_marginBottom="6dp" />
 
@@ -136,6 +139,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="학교명"
+                    android:textSize="15sp"
                     android:maxLines="1"
                     android:singleLine="true"
                     android:imeOptions="actionDone"/>
@@ -153,6 +157,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="전공"
+                    android:textSize="15sp"
                     android:maxLines="1"
                     android:singleLine="true"
                     android:imeOptions="actionDone"/>
@@ -197,6 +202,8 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:hint="예) 정보처리기사"
+                android:textColorHint="#66000000"
+                android:textSize="14sp"
                 android:background="@drawable/edit_text_background"
                 android:padding="12dp"
                 android:minHeight="48dp"

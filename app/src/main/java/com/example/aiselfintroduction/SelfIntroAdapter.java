@@ -20,6 +20,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.aiselfintroduction.R;
 import com.example.aiselfintroduction.SelfIntro;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -213,6 +215,28 @@ public class SelfIntroAdapter extends RecyclerView.Adapter<SelfIntroAdapter.View
         holder.moreIcon.setOnClickListener(v -> {
             PopupMenu popup = new PopupMenu(context, holder.moreIcon);
             popup.getMenuInflater().inflate(R.menu.self_intro_popup_menu, popup.getMenu());
+
+
+            // 아이콘 표시 활성화 (중요)
+            try {
+                Field field = PopupMenu.class.getDeclaredField("mPopup");
+                field.setAccessible(true);
+                Object menuPopupHelper = field.get(popup);
+
+                Class<?> classPopupHelper = Class.forName(menuPopupHelper.getClass().getName());
+                Method setForceShowIcon = classPopupHelper.getMethod("setForceShowIcon", boolean.class);
+                setForceShowIcon.invoke(menuPopupHelper, true);
+
+                // 오른쪽 여백을 줄이기 위한 오프셋 설정
+                Method method = classPopupHelper.getMethod("show", int.class, int.class);
+                method.invoke(menuPopupHelper, -30, 0); // x좌표를 왼쪽으로 30dp 이동
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+// 팝업 메뉴 표시
+            popup.show();
+
             popup.setOnMenuItemClickListener(menuItem -> {
                 int id = menuItem.getItemId();
                 if (id == R.id.menu_rename) { // 이름 변경
