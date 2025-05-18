@@ -76,7 +76,17 @@
             android:windowSoftInputMode="adjustPan"/>
 
         <activity
+            android:name=".EditListActivityFromHome"
+            android:exported="true"
+            android:windowSoftInputMode="adjustPan"/>
+
+        <activity
             android:name=".EditActivity"
+            android:exported="true"
+            android:windowSoftInputMode="adjustPan"/>
+
+        <activity
+            android:name=".EditActivityFromHome"
             android:exported="true"
             android:windowSoftInputMode="adjustPan"/>
 

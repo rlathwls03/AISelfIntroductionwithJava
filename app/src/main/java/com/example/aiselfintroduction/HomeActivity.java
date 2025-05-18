@@ -88,7 +88,7 @@ public class HomeActivity extends AppCompatActivity {
 
             // 클릭 리스너 설정
             recentContainer.setOnClickListener(v -> {
-                Intent intent = new Intent(HomeActivity.this, EditListActivity.class);
+                Intent intent = new Intent(HomeActivity.this, EditListActivityFromHome.class);
                 intent.putExtra("resumeTitle", recentIntroName);
                 startActivity(intent);
                 Log.d("HomeActivity", "최근 자기소개서 클릭: " + recentIntroName);
@@ -280,7 +280,7 @@ public class HomeActivity extends AppCompatActivity {
             recentText.setText(recentIntroName);
 
             recentContainer.setOnClickListener(v -> {
-                Intent intent = new Intent(HomeActivity.this, EditListActivity.class);
+                Intent intent = new Intent(HomeActivity.this, EditListActivityFromHome.class);
                 intent.putExtra("resumeTitle", recentIntroName);
                 startActivity(intent);
 
