@@ -80,12 +80,25 @@ public class InputActivity extends AppCompatActivity {
         imageUploadBox.setOnClickListener(v -> openImagePicker());
 
         generateButton.setOnClickListener(v -> {
+            // 예: MainActivity.java의 onCreate() 메서드 내에 추가
+            // 1. 누락된 파일이 있다면 생성
+            if (!AIResponseFileManager.allFilesExist(this)) {
+                XMLFileChecker.createTestXMLFiles(this);
+                Toast.makeText(this, "누락된 XML 파일을 생성했습니다.", Toast.LENGTH_SHORT).show();
+            }
+
             String text = convertedText.getText().toString();
             if (!text.isEmpty()) {
                 sendToAI(text);
             } else {
                 Toast.makeText(this, "공고문을 입력하세요.", Toast.LENGTH_SHORT).show();
             }
+
+            // 3. 다음 화면으로 이동
+            Intent intent = new Intent(InputActivity.this, EditListActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+            finish();
         });
 
         setupKeyboardEvents(convertedText, scrollView);
@@ -94,14 +107,6 @@ public class InputActivity extends AppCompatActivity {
             Intent intent = new Intent(InputActivity.this, HomeActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
             startActivity(intent);
-        });
-
-        // 홈 버튼
-        generateButton.setOnClickListener(v -> {
-            Intent intent = new Intent(InputActivity.this, EditListActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
-            finish();
         });
     }
 

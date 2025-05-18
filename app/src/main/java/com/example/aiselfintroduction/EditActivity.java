@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EditActivity extends AppCompatActivity {
-
+    private static final String TAG = "EditActivity";
     private ViewPager2 viewPager;
     private IntroPagerAdapter pagerAdapter;
     private EditText editTitle;
@@ -38,6 +38,7 @@ public class EditActivity extends AppCompatActivity {
 
     private List<IntroSection> sections = new ArrayList<>();
     private SelfIntroStorage selfIntroStorage; // 자기소개서 저장소 추가
+    private boolean fromXmlFiles = false; // XML 파일에서 로드했는지 여부
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +60,10 @@ public class EditActivity extends AppCompatActivity {
         dot4 = findViewById(R.id.dot4);
         btnBack = findViewById(R.id.btnBack);
 
+        // XML 파일에서 로드했는지 확인
+        fromXmlFiles = getIntent().getBooleanExtra("fromXmlFiles", false);
+        Log.d(TAG, "XML 파일에서 로드: " + fromXmlFiles);
+
         // 제목 초기화
         String resumeTitle = getIntent().getStringExtra("resumeTitle");
         if (resumeTitle != null && !resumeTitle.isEmpty()) {
@@ -67,30 +72,34 @@ public class EditActivity extends AppCompatActivity {
             editTitle.setText("AI 자기소개서");
         }
 
-        // AI JSON 응답 처리
-        String jsonString = getIntent().getStringExtra("aiJson");
-        if (jsonString != null) {
-            try {
-                JsonObject json = new Gson().fromJson(jsonString, JsonObject.class);
-                if (json.has("직무역량"))
-                    sections.add(new IntroSection("직무 역량", json.get("직무역량").getAsString()));
-                if (json.has("입사후포부"))
-                    sections.add(new IntroSection("입사 후 포부", json.get("입사후포부").getAsString()));
-                if (json.has("지원동기"))
-                    sections.add(new IntroSection("지원 동기", json.get("지원동기").getAsString()));
-                if (json.has("성격장단점"))
-                    sections.add(new IntroSection("성격의 장단점", json.get("성격장단점").getAsString()));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
+        // JSON 데이터 로드 및 섹션 데이터 구성
+        loadSectionsFromJson();
 
-        if (sections.isEmpty()) {
-            sections.add(new IntroSection("직무 역량", "직무 역량 샘플 내용입니다."));
-            sections.add(new IntroSection("입사 후 포부", "입사 후 포부 내용입니다."));
-            sections.add(new IntroSection("지원 동기", "지원 동기 내용입니다."));
-            sections.add(new IntroSection("성격의 장단점", "성격의 장단점 내용입니다."));
-        }
+
+//        // AI JSON 응답 처리
+//        String jsonString = getIntent().getStringExtra("aiJson");
+//        if (jsonString != null) {
+//            try {
+//                JsonObject json = new Gson().fromJson(jsonString, JsonObject.class);
+//                if (json.has("직무역량"))
+//                    sections.add(new IntroSection("직무 역량", json.get("직무역량").getAsString()));
+//                if (json.has("입사후포부"))
+//                    sections.add(new IntroSection("입사 후 포부", json.get("입사후포부").getAsString()));
+//                if (json.has("지원동기"))
+//                    sections.add(new IntroSection("지원 동기", json.get("지원동기").getAsString()));
+//                if (json.has("성격장단점"))
+//                    sections.add(new IntroSection("성격의 장단점", json.get("성격장단점").getAsString()));
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//        }
+
+//        if (sections.isEmpty()) {
+//            sections.add(new IntroSection("직무 역량", "직무 역량 샘플 내용입니다."));
+//            sections.add(new IntroSection("입사 후 포부", "입사 후 포부 내용입니다."));
+//            sections.add(new IntroSection("지원 동기", "지원 동기 내용입니다."));
+//            sections.add(new IntroSection("성격의 장단점", "성격의 장단점 내용입니다."));
+//        }
 
         pagerAdapter = new IntroPagerAdapter(sections);
         viewPager.setAdapter(pagerAdapter);
@@ -118,7 +127,7 @@ public class EditActivity extends AppCompatActivity {
                     (originalTitle != null ? originalTitle : "AI 자기소개서") :
                     currentTitle;
 
-            Log.d("EditActivity", "하드웨어 뒤로가기: 제목 전달 - " + titleToPass);
+            Log.d(TAG, "뒤로가기: 제목 전달 - " + titleToPass);
 
             // EditListActivity로 이동하면서 제목 전달
             Intent intent = new Intent(EditActivity.this, EditListActivity.class);
@@ -180,6 +189,35 @@ public class EditActivity extends AppCompatActivity {
             SharedPreferences prefs = getSharedPreferences("IntroPrefs", MODE_PRIVATE);
             prefs.edit().putString(HomeActivity.LAST_EDITED_KEY, title).apply();
 
+            // XML 파일에서 로드한 경우, 저장 후 XML 파일 삭제
+            // 확인용 로그 추가
+            Log.d(TAG, "fromXmlFiles: " + fromXmlFiles);
+
+            // 파일 존재 확인
+            boolean roleExists = AIResponseFileManager.sectionFileExists(this, "직무역량");
+            boolean goalExists = AIResponseFileManager.sectionFileExists(this, "입사후포부");
+            boolean reasonExists = AIResponseFileManager.sectionFileExists(this, "지원동기");
+            boolean personalityExists = AIResponseFileManager.sectionFileExists(this, "성격장단점");
+
+            Log.d(TAG, "저장 전 XML 파일 존재 여부: 직무역량=" + roleExists +
+                    ", 입사후포부=" + goalExists + ", 지원동기=" + reasonExists +
+                    ", 성격장단점=" + personalityExists);
+
+            // XML 파일 삭제 시도 (fromXmlFiles 플래그와 관계없이 항상 시도)
+            // 이렇게 하면 임시 파일은 항상 삭제됨
+            boolean filesDeleted = AIResponseFileManager.deleteAllResponseFiles(this);
+            Log.d(TAG, "XML 파일 삭제 결과: " + filesDeleted);
+
+            // 삭제 후 파일 존재 확인
+            roleExists = AIResponseFileManager.sectionFileExists(this, "직무역량");
+            goalExists = AIResponseFileManager.sectionFileExists(this, "입사후포부");
+            reasonExists = AIResponseFileManager.sectionFileExists(this, "지원동기");
+            personalityExists = AIResponseFileManager.sectionFileExists(this, "성격장단점");
+
+            Log.d(TAG, "삭제 후 XML 파일 존재 여부: 직무역량=" + roleExists +
+                    ", 입사후포부=" + goalExists + ", 지원동기=" + reasonExists +
+                    ", 성격장단점=" + personalityExists);
+
             // 저장 완료 토스트 메시지
             showSafeToast("저장되었습니다.");
 
@@ -203,6 +241,40 @@ public class EditActivity extends AppCompatActivity {
                 viewPager.post(() -> viewPager.setTranslationY(0));
             }
         });
+    }
+
+    /**
+     * JSON 데이터에서 섹션 데이터 로드
+     */
+    private void loadSectionsFromJson() {
+        // 기존 섹션 초기화
+        sections.clear();
+
+        // AI JSON 응답 처리
+        String jsonString = getIntent().getStringExtra("aiJson");
+        if (jsonString != null) {
+            try {
+                JsonObject json = new Gson().fromJson(jsonString, JsonObject.class);
+                if (json.has("직무역량"))
+                    sections.add(new IntroSection("직무 역량", json.get("직무역량").getAsString()));
+                if (json.has("입사후포부"))
+                    sections.add(new IntroSection("입사 후 포부", json.get("입사후포부").getAsString()));
+                if (json.has("지원동기"))
+                    sections.add(new IntroSection("지원 동기", json.get("지원동기").getAsString()));
+                if (json.has("성격장단점"))
+                    sections.add(new IntroSection("성격의 장단점", json.get("성격장단점").getAsString()));
+            } catch (Exception e) {
+                Log.e(TAG, "JSON 파싱 오류", e);
+            }
+        }
+
+        // 섹션이 비어있으면 기본값으로 채움
+        if (sections.isEmpty()) {
+            sections.add(new IntroSection("직무 역량", "직무 역량 샘플 내용입니다."));
+            sections.add(new IntroSection("입사 후 포부", "입사 후 포부 내용입니다."));
+            sections.add(new IntroSection("지원 동기", "지원 동기 내용입니다."));
+            sections.add(new IntroSection("성격의 장단점", "성격의 장단점 내용입니다."));
+        }
     }
 
     // JSON 키에서 내용 가져오기 (없으면 빈 문자열)
