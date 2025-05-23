@@ -95,7 +95,7 @@ public class HomeActivity extends AppCompatActivity {
             });
         } else {
             // 최근 편집한 자기소개서가 없는 경우
-            recentText.setText("수정한 자기소개서가 없습니다");
+            recentText.setText("수정한 자기소개서가 없음");
             // 클릭 비활성화
             recentContainer.setOnClickListener(null);
         }

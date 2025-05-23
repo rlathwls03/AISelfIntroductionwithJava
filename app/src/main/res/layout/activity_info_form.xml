@@ -108,7 +108,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="최종 학력"
-            android:textSize="15sp"
+            android:textSize="14sp"
             android:textStyle="bold"
             android:layout_marginBottom="6dp" />
 
@@ -175,19 +175,23 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
                 android:text="자격증/어학성적"
                 android:textSize="14sp"
                 android:textStyle="bold" />
 
             <ImageButton
                 android:id="@+id/certificateHintButton"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+                android:layout_width="20dp"
+                android:layout_height="22dp"
                 android:layout_marginLeft="4dp"
+                android:layout_marginTop="2dp"
+                android:padding="2dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:src="@drawable/ic_help_outline"
                 android:contentDescription="자격증 도움말"
-                app:tint="#888888" />
+                app:tint="#888888"
+                android:scaleType="centerInside"/>
         </LinearLayout>
 
         <LinearLayout
@@ -203,7 +207,7 @@
                 android:layout_weight="1"
                 android:hint="예) 정보처리기사"
                 android:textColorHint="#66000000"
-                android:textSize="14sp"
+                android:textSize="15sp"
                 android:background="@drawable/edit_text_background"
                 android:padding="12dp"
                 android:minHeight="48dp"
@@ -242,7 +246,7 @@
             android:background="@drawable/button_background"
             android:backgroundTint="@null"
             android:padding="10dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="5dp"
             android:layout_marginBottom="16dp"
             android:layout_marginRight="20dp"
             android:layout_marginLeft="40dp"/>

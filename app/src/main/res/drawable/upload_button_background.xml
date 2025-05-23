@@ -1,8 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="#FFFDF5" />
+    <!-- 그라데이션 배경 -->
+    <gradient
+        android:startColor="#FCD965"
+        android:endColor="#F9C23C"
+        android:angle="270" />
+
+    <!-- 테두리 설정 -->
     <stroke
         android:width="1dp"
         android:color="#F2E4B7" />
+
+    <!-- 모서리 둥글게 -->
     <corners android:radius="12dp" />
 </shape>

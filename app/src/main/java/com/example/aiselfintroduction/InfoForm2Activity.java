@@ -663,7 +663,7 @@ public class InfoForm2Activity extends AppCompatActivity {
             case "job":
                 title = "경력 사항 가이드";
                 message = "경력이나 근무 경험을 입력하세요.\n" +
-                        "예: 트럭 운송 2년 근무, 기아 생산직 인턴 1년 근무";
+                        "예: 한국 공항 공사 인턴, 한글과 컴퓨터 인턴";
                 break;
 
             case "personality":

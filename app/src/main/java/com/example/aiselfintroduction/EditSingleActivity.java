@@ -25,33 +25,58 @@ public class EditSingleActivity extends AppCompatActivity {
 
         // Intent로부터 데이터 받기
         String fieldKey = getIntent().getStringExtra("fieldKey");
-        String fieldContent = getIntent().getStringExtra("fieldContent");
+        String resumeTitle = getIntent().getStringExtra("resumeTitle");
 
         tvFieldTitle.setText(fieldKey != null ? fieldKey : "제목 없음");
-        tvFieldContent.setText(fieldContent != null ? fieldContent : "내용 없음");
 
-        // ✅ 텍스트뷰에 스크롤 기능 적용
+        // ✅ 저장소에서 데이터 로드
+        String fieldContent = "";
+        if (resumeTitle != null && fieldKey != null) {
+            SelfIntroStorage storage = new SelfIntroStorage(this);
+            SelfIntroData data = storage.loadSelfIntro(resumeTitle);
+
+            if (data != null) {
+                switch (fieldKey) {
+                    case "직무역량":
+                        fieldContent = data.get직무역량();
+                        break;
+                    case "입사후포부":
+                        fieldContent = data.get입사후포부();
+                        break;
+                    case "지원동기":
+                        fieldContent = data.get지원동기();
+                        break;
+                    case "성격장단점":
+                        fieldContent = data.get성격장단점();
+                        break;
+                    default:
+                        fieldContent = "지원 항목이 올바르지 않습니다.";
+                }
+            } else {
+                fieldContent = "저장된 데이터가 없습니다.";
+            }
+        } else {
+            fieldContent = "필수 정보 누락";
+        }
+
+        tvFieldContent.setText(fieldContent);
         tvFieldContent.setMovementMethod(new ScrollingMovementMethod());
 
-        // ✅ 터치 시 부모 스크롤 방지 → TextView만 스크롤되도록
+        // 스크롤 충돌 방지
         tvFieldContent.setOnTouchListener((v, event) -> {
             v.getParent().requestDisallowInterceptTouchEvent(true);
             return false;
         });
 
-        // X 버튼 누르면 화면 종료
+        // X 버튼: EditListActivity로 돌아감
         btnClose.setOnClickListener(v -> {
-            // 원래 자기소개서 제목을 다시 EditListActivity로 전달
-            String resumeTitle = getIntent().getStringExtra("resumeTitle");
-
-            // 로그 추가
-            Log.d("EditSingleActivity", "닫기 버튼: 원래 제목으로 돌아가기 - " + resumeTitle);
-
             Intent intent = new Intent(EditSingleActivity.this, EditListActivity.class);
             if (resumeTitle != null && !resumeTitle.isEmpty()) {
                 intent.putExtra("resumeTitle", resumeTitle);
-            }startActivity(intent);
+            }
+            startActivity(intent);
             finish();
         });
     }
+
 }

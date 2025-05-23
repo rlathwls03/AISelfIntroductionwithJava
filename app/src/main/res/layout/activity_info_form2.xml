@@ -63,8 +63,8 @@
 
             <ImageButton
                 android:id="@+id/jobHintButton"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+                android:layout_width="20dp"
+                android:layout_height="22dp"
                 android:layout_marginLeft="4dp"
                 android:padding="2dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
@@ -131,8 +131,8 @@
 
             <ImageButton
                 android:id="@+id/personalityHintButton"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+                android:layout_width="20dp"
+                android:layout_height="22dp"
                 android:layout_marginLeft="4dp"
                 android:padding="2dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
@@ -224,8 +224,8 @@
 
             <ImageButton
                 android:id="@+id/experienceHintButton"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+                android:layout_width="20dp"
+                android:layout_height="22dp"
                 android:layout_marginLeft="4dp"
                 android:padding="2dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
@@ -268,8 +268,8 @@
 
             <ImageButton
                 android:id="@+id/sentenceHintButton"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+                android:layout_width="20dp"
+                android:layout_height="22dp"
                 android:layout_marginLeft="4dp"
                 android:padding="2dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
@@ -302,18 +302,21 @@
             android:text="포트폴리오 파일 업로드 (.pdf)"
             android:textSize="14sp"
             android:textStyle="bold"
-            android:layout_marginBottom="6dp" />
+            android:layout_marginBottom="8dp" />
 
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/uploadButton"
-            android:layout_width="match_parent"
+            android:layout_width="270dp"
             android:layout_height="100dp"
             android:background="@drawable/upload_button_background"
             android:drawableTop="@drawable/ic_cloud_upload"
             android:drawablePadding="-10dp"
+            android:paddingTop="20dp"
             android:text="파일을 선택하세요"
             android:textColor="#777777"
-            android:layout_marginBottom="16dp" />
+            android:layout_marginLeft="23dp"
+            android:layout_marginBottom="16dp"
+            android:backgroundTint="@null" />
 
         <!-- 파일 목록 컨테이너 추가 -->
         <LinearLayout
@@ -338,7 +341,7 @@
             android:layout_marginTop="16dp"
             android:layout_marginBottom="16dp"
             android:layout_marginRight="20dp"
-            android:layout_marginLeft="40dp"/>
+            android:layout_marginLeft="35dp"/>
 
     </LinearLayout>
 </ScrollView>
