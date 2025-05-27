@@ -9,7 +9,7 @@
 
 #include "GenieWrapper.hpp"
 
-extern "C" JNIEXPORT jlong JNICALL Java_com_quicinc_chatapp_GenieWrapper_loadModel(JNIEnv* env,
+extern "C" JNIEXPORT jlong JNICALL Java_com_example_aiselfintroduction_GenieWrapper_loadModel(JNIEnv* env,
                                                                                    jobject /* this */,
                                                                                    jstring model_dir_path,
                                                                                    jstring htp_config_path)
@@ -34,7 +34,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_com_quicinc_chatapp_GenieWrapper_loadMod
     }
 }
 
-extern "C" JNIEXPORT void JNICALL Java_com_quicinc_chatapp_GenieWrapper_getResponseForPrompt(JNIEnv* env,
+extern "C" JNIEXPORT void JNICALL Java_com_example_aiselfintroduction_GenieWrapper_getResponseForPrompt(JNIEnv* env,
                                                                                              jobject /* this */,
                                                                                              jlong genie_wrapper_handle,
                                                                                              jstring user_question,
@@ -59,7 +59,7 @@ extern "C" JNIEXPORT void JNICALL Java_com_quicinc_chatapp_GenieWrapper_getRespo
     }
 }
 
-extern "C" JNIEXPORT void JNICALL Java_com_quicinc_chatapp_GenieWrapper_freeModel(JNIEnv* env,
+extern "C" JNIEXPORT void JNICALL Java_com_example_aiselfintroduction_GenieWrapper_freeModel(JNIEnv* env,
                                                                                   jobject /* this */,
                                                                                   jlong genie_wrapper_handle)
 {

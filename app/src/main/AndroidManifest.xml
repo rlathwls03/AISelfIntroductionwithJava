@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.quicinc.chatapp">
+    package="com.example.aiselfintroduction">
 
     <!-- 파일 접근 권한 -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
@@ -21,7 +21,7 @@
 
 
         <activity
-            android:name="com.quicinc.chatapp.MainActivity"
+            android:name="com.example.aiselfintroduction.MainActivity"
             android:exported="true" />
 
         <activity
@@ -50,47 +50,47 @@
             android:windowSoftInputMode="adjustPan"/>
 
         <activity
-            android:name="com.quicinc.chatapp.Conversation"
-            android:parentActivityName="com.quicinc.chatapp.MainActivity" >
+            android:name="com.example.aiselfintroduction.Conversation"
+            android:parentActivityName="com.example.aiselfintroduction.MainActivity" >
         </activity>
 
         <!-- 정보 입력 액티비티들 -->
         <activity
-            android:name="com.quicinc.chatapp.InfoFormActivity"
+            android:name="com.example.aiselfintroduction.InfoFormActivity"
             android:windowSoftInputMode="adjustPan"
             android:exported="true" />
 
         <!-- 홈 액티비티 -->
         <activity
-            android:name="com.quicinc.chatapp.HomeActivity"
+            android:name="com.example.aiselfintroduction.HomeActivity"
             android:exported="true"
             android:launchMode="singleTop" />
 
         <activity
-            android:name="com.quicinc.chatapp.InfoForm2Activity"
+            android:name="com.example.aiselfintroduction.InfoForm2Activity"
             android:windowSoftInputMode="adjustPan"
             android:exported="false" />
 
         <activity
-            android:name="com.quicinc.chatapp.FavoritesActivity"
+            android:name="com.example.aiselfintroduction.FavoritesActivity"
             android:exported="true" />
 
         <activity
-            android:name="com.quicinc.chatapp.InputActivity"
+            android:name="com.example.aiselfintroduction.InputActivity"
             android:exported="true" />
 
         <activity
-            android:name="com.quicinc.chatapp.EditListActivityFromHome"
+            android:name="com.example.aiselfintroduction.EditListActivityFromHome"
             android:exported="true"
             android:windowSoftInputMode="adjustPan"/>
 
         <activity
-            android:name="com.quicinc.chatapp.EditActivityFromHome"
+            android:name="com.example.aiselfintroduction.EditActivityFromHome"
             android:exported="true"
             android:windowSoftInputMode="adjustPan"/>
 
         <activity
-            android:name="com.quicinc.chatapp.DownloadActivity"
+            android:name="com.example.aiselfintroduction.DownloadActivity"
             android:exported="true" />
 
         <activity
