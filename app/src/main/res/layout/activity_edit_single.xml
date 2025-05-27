@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#FFFCF4"
+    android:paddingStart="24dp"
+    android:paddingEnd="24dp"
+    android:paddingBottom="24dp"
+    android:paddingTop="60dp">
+
+    <!-- 상단 헤더: X 버튼 + 가운데 제목 -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp">
+
+        <ImageButton
+            android:id="@+id/btnClose"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/ic_close"
+            android:background="@android:color/transparent"
+            android:contentDescription="닫기"
+            android:layout_alignParentStart="true" />
+
+        <TextView
+            android:id="@+id/tvHeaderTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="AI 자기소개서 미리보기"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_centerInParent="true" />
+    </RelativeLayout>
+
+
+    <!-- 항목 제목 (가운데 정렬) -->
+    <TextView
+        android:id="@+id/tvFieldTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="직무 역량"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textColor="#FFA000"
+        android:gravity="center"
+        android:layout_marginBottom="8dp" />
+
+    <TextView
+        android:id="@+id/tvFieldContent"
+        android:layout_width="match_parent"
+        android:layout_height="500dp"
+        android:text="항목 내용"
+        android:textSize="15sp"
+        android:padding="16dp"
+        android:background="@drawable/bg_textbox_outline"
+        android:textColor="#000000"
+        android:scrollbars="vertical"
+        android:overScrollMode="always" />
+
+    <!-- 하단 자 수 표시 -->
+    <TextView
+        android:id="@+id/charCount"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="40/1000 자 (공백 포함)"
+        android:textSize="12sp"
+        android:textColor="#888888"
+        android:gravity="end"
+        android:layout_marginTop="8dp" />
+</LinearLayout>

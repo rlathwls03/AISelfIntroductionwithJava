@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- 선택된 탭일 때 흰색 -->
+    <item android:color="#FFFFFF" android:state_checked="true" />
+    <!-- 비선택 상태는 어두운 회색 -->
+    <item android:color="#888888" />
+</selector>

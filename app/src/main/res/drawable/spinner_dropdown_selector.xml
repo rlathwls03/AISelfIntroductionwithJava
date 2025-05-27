@@ -1,0 +1,15 @@
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="#1AFCD965"> <!-- ripple 효과 노란색 살짝 투명 -->
+
+    <item android:id="@android:id/mask">
+        <shape android:shape="rectangle">
+            <solid android:color="#FCD965" />
+        </shape>
+    </item>
+
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#FFFDF5" /> <!-- 기본 배경색 -->
+        </shape>
+    </item>
+</ripple>

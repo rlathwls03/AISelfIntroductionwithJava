@@ -1,9 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.example.aiselfintroduction">
+    package="com.quicinc.chatapp">
+
+    <!-- 파일 접근 권한 -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
+        android:largeHeap="true"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -11,15 +17,93 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.AISelfIntroduction"
-        tools:targetApi="31">
+        android:theme="@style/Theme.ChatApp">
+
+
         <activity
-            android:name=".MainActivity"
-            android:exported="true">
+            android:name="com.quicinc.chatapp.MainActivity"
+            android:exported="true" />
+
+        <activity
+            android:name=".SplashActivity"
+            android:exported="true"
+            android:windowSoftInputMode="adjustPan">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".EditActivity"
+            android:exported="true"
+            android:windowSoftInputMode="adjustPan"/>
+
+        <activity
+            android:name=".EditListActivity"
+            android:exported="true"
+            android:windowSoftInputMode="adjustPan"/>
+
+        <activity
+            android:name=".EditSingleActivity"
+            android:exported="true"
+            android:windowSoftInputMode="adjustPan"/>
+
+        <activity
+            android:name="com.quicinc.chatapp.Conversation"
+            android:parentActivityName="com.quicinc.chatapp.MainActivity" >
+        </activity>
+
+        <!-- 정보 입력 액티비티들 -->
+        <activity
+            android:name="com.quicinc.chatapp.InfoFormActivity"
+            android:windowSoftInputMode="adjustPan"
+            android:exported="true" />
+
+        <!-- 홈 액티비티 -->
+        <activity
+            android:name="com.quicinc.chatapp.HomeActivity"
+            android:exported="true"
+            android:launchMode="singleTop" />
+
+        <activity
+            android:name="com.quicinc.chatapp.InfoForm2Activity"
+            android:windowSoftInputMode="adjustPan"
+            android:exported="false" />
+
+        <activity
+            android:name="com.quicinc.chatapp.FavoritesActivity"
+            android:exported="true" />
+
+        <activity
+            android:name="com.quicinc.chatapp.InputActivity"
+            android:exported="true" />
+
+        <activity
+            android:name="com.quicinc.chatapp.EditListActivityFromHome"
+            android:exported="true"
+            android:windowSoftInputMode="adjustPan"/>
+
+        <activity
+            android:name="com.quicinc.chatapp.EditActivityFromHome"
+            android:exported="true"
+            android:windowSoftInputMode="adjustPan"/>
+
+        <activity
+            android:name="com.quicinc.chatapp.DownloadActivity"
+            android:exported="true" />
+
+        <activity
+            android:name=".EditSingleActivityFromHome"
+            android:exported="true"
+            android:windowSoftInputMode="adjustPan"/>
+
+        <uses-native-library
+            android:name="libadsprpc.so"
+            android:required="false" />
+        <uses-native-library
+            android:name="libcdsprpc.so"
+            android:required="false" />
     </application>
+
 </manifest>

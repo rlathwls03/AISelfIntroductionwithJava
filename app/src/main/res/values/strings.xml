@@ -1,3 +1,7 @@
 <resources>
-    <string name="app_name">AISelfIntroduction</string>
+    <string name="app_name">AI-ntro</string>
+    <string name="google_api_key">AIzaSyAWYaTbIDNls7W1wwKBYWRiRUoip7uJLzI</string>
+    <string name="chat_with_llama_3_2_3b">Chat with Llama 3.2 3B</string>
+    <string name="user_hint_msg">메시지를 입력하세요</string>
+    <string name="sends_user_message">보내기</string>
 </resources>
