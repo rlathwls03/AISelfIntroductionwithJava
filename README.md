@@ -1,4 +1,4 @@
-## AI-ntro(2025 캡스톤디자인)
+# AI-ntro(2025 캡스톤디자인)
 온디바이스 AI 기반 자기소개서 자동 생성 앱
 
 ![preview 이미지1](https://github.com/user-attachments/assets/e61aad4c-9253-49ed-a8a5-a16ed10f22e6)
