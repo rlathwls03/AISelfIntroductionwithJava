@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:fitsSystemWindows="true"
+    android:background="#FFFBEA">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="20dp">
+
+            <!-- 상단 카드 -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/favoritesCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp"
+                app:cardBackgroundColor="#FCD965">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="16dp"
+                    android:gravity="center_vertical">
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/ic_star_black" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:layout_marginStart="12dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="즐겨찾기한 자기소개서"
+                            android:textStyle="bold"
+                            android:textSize="16sp"
+                            android:textColor="#000" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="자주 사용하는 자기소개서를 빠르게 확인하세요."
+                            android:textSize="14sp"
+                            android:textColor="#444" />
+                    </LinearLayout>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- RecyclerView for favorites -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerview_favorites"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/favoritesCard"
+                android:padding="8dp"
+                android:visibility="gone"
+                android:contentDescription="즐겨찾기한 자기소개서 목록"
+                android:accessibilityLiveRegion="polite" />
+
+            <!-- 비어 있을 때 안내 메시지 -->
+            <LinearLayout
+                android:id="@+id/emptyState"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_below="@id/favoritesCard"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="80dp"
+                android:visibility="visible"
+                android:gravity="center_horizontal">
+
+                <ImageView
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:src="@drawable/ic_folder_gray"
+                    android:contentDescription="빈 폴더 아이콘"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="즐겨찾기한 자기소개서가 없습니다."
+                    android:textSize="16sp"
+                    android:textColor="#444"
+                    android:layout_marginTop="12dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="홈 탭에서 즐겨찾기를 추가해보세요!"
+                    android:textSize="14sp"
+                    android:textColor="#888"
+                    android:layout_marginTop="4dp" />
+            </LinearLayout>
+        </RelativeLayout>
+    </ScrollView>
+
+    <!-- 하단 탭바 -->
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottom_navigation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bottom_nav_background"
+        android:contentDescription="하단 네비게이션 메뉴"
+        app:menu="@menu/bottom_nav_menu"
+        app:itemIconTint="@color/bottom_nav_selector"
+        app:itemTextColor="@color/bottom_nav_selector"
+        app:labelVisibilityMode="labeled" />
+</LinearLayout>

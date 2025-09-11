@@ -1,0 +1,347 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFBEA"
+    android:fillViewport="true"
+    android:fitsSystemWindows="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <!-- Header -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="12dp">
+
+            <ImageButton
+                android:id="@+id/backButton"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:padding="12dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_arrow_back"
+                android:contentDescription="뒤로 가기"
+                app:tint="#000000" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="기본 정보 입력/수정"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_marginLeft="45dp"
+                android:textColor="#000000"/>
+
+            <View
+                android:layout_width="24dp"
+                android:layout_height="24dp" />
+        </LinearLayout>
+
+        <!-- 경력 사항 with Hint Button -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="6dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="경력 사항"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <ImageButton
+                android:id="@+id/jobHintButton"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginLeft="4dp"
+                android:padding="2dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_help_outline"
+                android:contentDescription="경력사항 도움말"
+                app:tint="#888888"
+                android:scaleType="centerInside" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <EditText
+                android:id="@+id/jobInput"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="예) IT 직무, 삼성 개발자 1년"
+                android:textColorHint="#66000000"
+                android:textSize="14sp"
+                android:background="@drawable/edit_text_background"
+                android:padding="12dp"
+                android:minHeight="48dp"
+                android:maxLines="1"
+                android:singleLine="true"
+                android:imeOptions="actionDone"
+                android:layout_marginEnd="8dp" />
+
+            <ImageButton
+                android:id="@+id/addJobButton"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:padding="12dp"
+                android:src="@drawable/ic_add_circle_outline"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="경력 추가"
+                app:tint="#FCD965" />
+        </LinearLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/jobChipsRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="16dp" />
+
+        <!-- 성격 장단점 with Hint Button -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="6dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="자소서 성격 장단점"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <ImageButton
+                android:id="@+id/personalityHintButton"
+                android:layout_width="20dp"
+                android:layout_height="22dp"
+                android:layout_marginLeft="4dp"
+                android:padding="2dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_help_outline"
+                android:contentDescription="성격 장단점 도움말"
+                app:tint="#888888"
+                android:scaleType="centerInside" />
+        </LinearLayout>
+
+        <!-- 성격 장단점 -->
+        <EditText
+            android:id="@+id/personalityInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/edit_text_background"
+            android:gravity="top"
+            android:textColorHint="#66000000"
+            android:textSize="14sp"
+            android:hint="예) 꼼꼼하고 책임감 있는 성격으로..."
+            android:padding="12dp"
+            android:layout_marginBottom="16dp"
+            android:inputType="textMultiLine"
+            android:minHeight="120dp"
+            android:maxHeight="240dp"/>
+
+        <!-- 키워드 -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="경력 관련 키워드"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="6dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <EditText
+                android:id="@+id/keywordInput"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="예) 데이터 분석, MySQL"
+                android:textColorHint="#66000000"
+                android:textSize="14sp"
+                android:background="@drawable/edit_text_background"
+                android:padding="12dp"
+                android:minHeight="48dp"
+                android:maxLines="1"
+                android:singleLine="true"
+                android:imeOptions="actionDone"
+                android:layout_marginEnd="8dp" />
+
+            <ImageButton
+                android:id="@+id/addKeywordButton"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:padding="12dp"
+                android:src="@drawable/ic_add_circle_outline"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="키워드 추가"
+                app:tint="#FCD965" />
+        </LinearLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/keywordChipsRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="16dp" />
+
+        <!-- 개인 경험 with Hint Button -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="6dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="개인 경험 (이전 프로젝트, 업무 관련)"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <ImageButton
+                android:id="@+id/experienceHintButton"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginLeft="4dp"
+                android:padding="2dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_help_outline"
+                android:contentDescription="개인 경험 도움말"
+                app:tint="#888888"
+                android:scaleType="centerInside" />
+        </LinearLayout>
+
+        <!-- 개인 경험 -->
+        <EditText
+            android:id="@+id/experienceInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/edit_text_background"
+            android:gravity="top"
+            android:hint="예) 실제 서비스에 배포된 웹 프로젝트..."
+            android:textColorHint="#66000000"
+            android:textSize="14sp"
+            android:padding="12dp"
+            android:layout_marginBottom="16dp"
+            android:inputType="textMultiLine"
+            android:minHeight="120dp"
+            android:maxHeight="240dp"/>
+
+        <!-- 자소서 문장 with Hint Button -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="6dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="자기소개서에 포함하고 싶은 문장"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <ImageButton
+                android:id="@+id/sentenceHintButton"
+                android:layout_width="20dp"
+                android:layout_height="22dp"
+                android:layout_marginLeft="4dp"
+                android:padding="2dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_help_outline"
+                android:contentDescription="특별한 문장 도움말"
+                app:tint="#888888"
+                android:scaleType="centerInside" />
+        </LinearLayout>
+
+        <!-- 자소서 문장 -->
+        <EditText
+            android:id="@+id/extraSentenceInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/edit_text_background"
+            android:gravity="top"
+            android:hint="예) 논리적 사고와 빠른 실행력을..."
+            android:textColorHint="#66000000"
+            android:textSize="14sp"
+            android:padding="12dp"
+            android:layout_marginBottom="16dp"
+            android:inputType="textMultiLine"
+            android:minHeight="120dp"
+            android:maxHeight="240dp"/>
+
+        <!-- 파일 업로드 -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="포트폴리오 파일 업로드 (.pdf)"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/uploadButton"
+            android:layout_width="270dp"
+            android:layout_height="100dp"
+            android:background="@drawable/upload_button_background"
+            android:drawableTop="@drawable/ic_cloud_upload"
+            android:paddingTop="20dp"
+            android:drawablePadding="-10dp"
+            android:text="파일을 선택하세요"
+            android:textColor="#777777"
+            android:layout_marginLeft="23dp"
+            android:layout_marginBottom="16dp"
+            android:backgroundTint="@null" />
+
+        <!-- 파일 목록 컨테이너 추가 -->
+        <LinearLayout
+            android:id="@+id/fileListContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Save Button -->
+        <Button
+            android:id="@+id/saveButton"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:text="저장"
+            android:textColor="#FFFFFF"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:background="@drawable/button_background"
+            android:backgroundTint="@null"
+            android:padding="10dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginLeft="35dp"/>
+
+    </LinearLayout>
+</ScrollView>
